@@ -1,0 +1,29 @@
+// Welfare.idl : Welfare.exe 的类型库源
+
+// 此文件将由 MIDL 编译器处理以产生
+// 类型库(Welfare.tlb)。
+
+[ uuid(7C324A1D-5CAF-4370-B220-05C385ED98F9), version(1.0) ]
+library Welfare
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  CWelfareDoc 的主调度接口
+	
+	[ uuid(5ED7BFFF-BF58-4689-A65C-11D4A2C93DA8) ]
+	dispinterface IWelfare
+	{
+		properties:
+			
+		methods:
+	};
+
+	//  CWelfareDoc 的类信息
+	
+	[ uuid(064F636F-DB71-4D4A-BA15-5F33353F180B) ]
+	coclass Welfare
+	{
+		[default] dispinterface IWelfare;
+	};
+};

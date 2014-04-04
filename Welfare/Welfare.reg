@@ -1,0 +1,17 @@
+REGEDIT
+; 此 .REG 文件可能由 SETUP 程序使用。
+;   如果 SETUP 程序不可用，则调用
+;   CWinApp::RegisterShellFileTypes 和 COleObjectFactory::UpdateRegistryAll
+;   在 InitInstance 中对下列项自动进行注册。
+
+
+HKEY_CLASSES_ROOT\Welfare.Application = Welfare Application
+
+
+HKEY_CLASSES_ROOT\Welfare.Application\CLSID = {064F636F-DB71-4D4A-BA15-5F33353F180B}
+
+HKEY_CLASSES_ROOT\CLSID\{064F636F-DB71-4D4A-BA15-5F33353F180B} = Welfare Application
+HKEY_CLASSES_ROOT\CLSID\{064F636F-DB71-4D4A-BA15-5F33353F180B}\ProgId = Welfare.Application
+
+
+HKEY_CLASSES_ROOT\CLSID\{064F636F-DB71-4D4A-BA15-5F33353F180B}\LocalServer32 = Welfare.EXE
