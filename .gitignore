@@ -19,3 +19,12 @@
 *.exe
 *.out
 *.app
+
+# log
+*.tlog
+*.log
+
+# vs
+*.pch
+*.pdb
+*.tlb
