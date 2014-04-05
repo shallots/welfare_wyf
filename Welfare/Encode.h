@@ -26,6 +26,7 @@ public:
 
 	Encode();
 	~Encode();
+
 	// 3向量编码函数，成功，返回完成的编码个数
 	int encoding(vector<int>, vector<int>, vector<int>);
 	// 4向量编码函数，成功，返回编码个数
