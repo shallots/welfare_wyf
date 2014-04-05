@@ -219,7 +219,7 @@ int Encode::ordering()
 	return 1;
 }
 
-int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<Gossip> gossip)
+int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<Gossip> gossip)
 {
 	if(!codeFlag)
 	{
@@ -230,6 +230,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<Gossip> g
 	// 杀码有序化
 	sort(plustail.begin(),plustail.end());
 	sort(boldcode.begin(),boldcode.end());
+	sort(hdr.begin(),hdr.end());
 
 	//  和尾值杀码,算法有待优化
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
@@ -263,7 +264,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<Gossip> g
 		}
 
 		// 胆码判定成功才能进入八卦二码杀码
-		if(flag || (!boldcode.size() && !boldcode.size() && gossip.size()))
+		if(flag || (!plustail.size() && !boldcode.size() && gossip.size()))
 		{
 			for(vector<Gossip>::iterator it=gossip.begin(); it != gossip.end(); it++)
 			{
@@ -282,6 +283,21 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<Gossip> g
 				}
 			}
 		}
+
+		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() &&hdr.size()))
+		{
+			for(vector<int>::iterator it=hdr.begin(); it!=hdr.end(); it++)
+			{
+				if(itcode->codeSeq[0] == *it)
+				{
+					flag = true;
+					break;
+				}else{
+					flag = false;
+				}
+			}
+		}
+		
 		if(!flag)
 		{
 			itcode = dvCode.erase(itcode);
@@ -290,7 +306,6 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<Gossip> g
 			itcode ++;
 		}
 	}
-	// 八卦二码杀码
 
 	return count;
 }

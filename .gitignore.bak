@@ -23,3 +23,8 @@
 # log
 *.tlog
 *.log
+
+# vs
+*.pch
+*.pdb
+*.tlb
