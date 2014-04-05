@@ -104,8 +104,8 @@ public:
 //	afx_msg void OnLbnSelchangeListcode();
 	afx_msg void OnSave();
 	afx_msg void OnQuit();
-	CButton m_prePrint;
-	afx_msg void OnBnClickedPreprint();
+//	CButton m_prePrint;
+//	afx_msg void OnBnClickedPreprint();
 	CEdit m_arr4;
 	afx_msg void OnSetfocusArr4();
 	afx_msg void OnAbout();
@@ -117,5 +117,6 @@ public:
 	afx_msg void OnBnClickedKilloddeven();
 	afx_msg void OnBnClickedKillbiglittle();
 	CButton m_groupChoose;
+	CEdit m_hundred;
 };
 int isInSift(CString code);

@@ -94,12 +94,13 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TWOCODE, m_twoCode);
 	DDX_Control(pDX, IDC_SIFT, m_sift);
 	//DDX_Control(pDX, IDC_DIRECT, m_direct);
-	DDX_Control(pDX, IDC_PREPRINT, m_prePrint);
+	//  DDX_Control(pDX, IDC_PREPRINT, m_prePrint);
 	DDX_Control(pDX, IDC_ARR4, m_arr4);
 	DDX_Control(pDX, IDC_KILLBIGLITTLE, m_killABL);
 	DDX_Control(pDX, IDC_KILLODDEVEN, m_killAOE);
 	//  DDX_Control(pDX, IDC_KILLPAIR, m_killPair);
 	DDX_Control(pDX, IDC_GROUPC, m_groupChoose);
+	DDX_Control(pDX, IDC_HUNDRED, m_hundred);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -127,7 +128,7 @@ BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
 //ON_LBN_SELCHANGE(IDC_LISTCODE, &CWelfareDlg::OnLbnSelchangeListcode)
 ON_COMMAND(ID_SAVE, &CWelfareDlg::OnSave)
 ON_COMMAND(ID_QUIT, &CWelfareDlg::OnQuit)
-ON_BN_CLICKED(IDC_PREPRINT, &CWelfareDlg::OnBnClickedPreprint)
+//ON_BN_CLICKED(IDC_PREPRINT, &CWelfareDlg::OnBnClickedPreprint)
 ON_EN_SETFOCUS(IDC_ARR4, &CWelfareDlg::OnSetfocusArr4)
 ON_COMMAND(ID_ABOUT, &CWelfareDlg::OnAbout)
 ON_LBN_SELCHANGE(IDC_LISTCODE, &CWelfareDlg::OnSelchangeListcode)
@@ -206,7 +207,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发 (2014.04.04)"));
+	 m_StatusBar.SetPaneText(1,_T("·我要发· (2014.04.05)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -458,8 +459,15 @@ void CWelfareDlg::OnBnClickedForcast()
 		m_groupChoose.EnableWindow(false);
 		totalCodeCount = ec->dvCode.size();
 		CString stat;
-		stat.Format(_T("组选：初步预测3D码数: %d个。"),ec->dvCode.size());
-		m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));
+		// 组选
+		if(m_groupChoose.GetCheck())
+		{
+			stat.Format(_T("组选：初步预测3D码数: %d个。"),ec->dvCode.size());
+			m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));
+		}else{
+			stat.Format(_T("直选：初步预测3D码数: %d个。"),ec->dvCode.size());
+			m_StatusBar.SetPaneText(0,_T("组码规则: 直选"));		
+		}		
 		m_REInfo.SetWindowTextW(stat);
 	}else{
 		m_REInfo.SetWindowTextW(_T("输入数据不完整,请仔细检查!"));
@@ -476,18 +484,19 @@ void CWelfareDlg::OnBnClickedKillcode()
 		return;
 	}
 	vector<Gossip> gossip;
-	vector<int> arrkc[2];
-	CString csstr[2];
+	vector<int> arrkc[3];
+	CString csstr[3];
 	CString sgossip;
 
 	m_plusTail.GetWindowTextW(csstr[0]);
 	m_boldCode.GetWindowTextW(csstr[1]);
+	m_hundred.GetWindowTextW(csstr[2]);
 	m_twoCode.GetWindowTextW(sgossip);
 	int count = 0;
 	if(csstr[0].GetLength()||csstr[1].GetLength()
-		|| sgossip.GetLength())
+		|| sgossip.GetLength()||csstr[2].GetLength())
 	{
-		for(int i=0; i<2; i++)
+		for(int i=0; i<3; i++)
 		{
 			int length = csstr[i].GetLength();
 			char *p = (LPSTR)(LPCTSTR)csstr[i];
@@ -519,11 +528,12 @@ void CWelfareDlg::OnBnClickedKillcode()
 				k += 2;
 			}
 		}
-		count = ec->killCode(arrkc[0],arrkc[1],gossip);
+		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],gossip);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
 	// 杀掉对子
+	/*
 	int pairNum = 0;
 	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
 	{
@@ -536,6 +546,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 		}
 		it++;
 	}
+	*/
 
 	m_listCode.ResetContent();
 	int siftCount = 0;
@@ -588,10 +599,10 @@ void CWelfareDlg::OnBnClickedKillcode()
 
 	
 	CString ts;
-	if((siftCount|pairNum|oeCount|blCount) != 0)
+	if((siftCount|oeCount|blCount) != 0)
 	{
-		int delTotal = count+siftCount+pairNum+oeCount+blCount;
-		ts.Format(_T("杀码 %d 个(杀两头: %d 个, 全大全小： %d，全奇全偶: %d个,\n其他:%d 个，其中对子: %d 个)，选出 %d 个."),delTotal,siftCount,blCount,oeCount,count,pairNum, ec->dvCode.size());
+		int delTotal = count+siftCount+oeCount+blCount;
+		ts.Format(_T("杀码 %d 个(杀两头: %d 个, 全大全小： %d，全奇全偶: %d个,\n其他:%d 个)，选出 %d 个."),delTotal,siftCount,blCount,oeCount,count, ec->dvCode.size());
 	}else
 		ts.Format(_T("杀码 %d 个，选出 %d 个."),count,ec->dvCode.size());
 	m_REInfo.SetWindowTextW(ts);
@@ -732,6 +743,7 @@ void CWelfareDlg::OnBnClickedReset()
 	m_boldCode.SetWindowTextW(_T(""));
 	m_twoCode.SetWindowTextW(_T(""));
 	m_REInfo.SetWindowTextW(_T(""));
+	m_hundred.SetWindowTextW(_T(""));
 	m_groupChoose.EnableWindow(true);
 	m_StatusBar.SetPaneText(0,_T("欢迎使用！"));
 	forcastFlag = FALSE;
@@ -884,18 +896,18 @@ void CWelfareDlg::OnQuit()
 }
 
 
-void CWelfareDlg::OnBnClickedPreprint()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if(!forcastFlag)
-	{
-		MessageBox(_T("请预测后再操作"),_T("提示"),MB_OK);
-		return;
-	}
-	CPrePrintDlg cpp;
-	cpp.cParentWnd = this;
-	cpp.DoModal();
-}
+//void CWelfareDlg::OnBnClickedPreprint()
+//{
+//	// TODO: 在此添加控件通知处理程序代码
+//	if(!forcastFlag)
+//	{
+//		MessageBox(_T("请预测后再操作"),_T("提示"),MB_OK);
+//		return;
+//	}
+//	CPrePrintDlg cpp;
+//	cpp.cParentWnd = this;
+//	cpp.DoModal();
+//}
 
 
 
