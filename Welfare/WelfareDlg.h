@@ -118,5 +118,7 @@ public:
 	afx_msg void OnBnClickedKillbiglittle();
 	CButton m_groupChoose;
 	CEdit m_hundred;
+	CEdit m_decade;
+	CEdit m_unit;
 };
 int isInSift(CString code);

@@ -108,7 +108,17 @@
     <None Include="Welfare.reg" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CApplication.h" />
+    <ClInclude Include="CDocuments.h" />
     <ClInclude Include="CListBox.h" />
+    <ClInclude Include="CMyDocument.h" />
+    <ClInclude Include="CMyFont.h" />
+    <ClInclude Include="CParagraph.h" />
+    <ClInclude Include="CParagraphFormat.h" />
+    <ClInclude Include="CParagraphs.h" />
+    <ClInclude Include="CRange.h" />
+    <ClInclude Include="CSection.h" />
+    <ClInclude Include="CSelection.h" />
     <ClInclude Include="DlgProxy.h" />
     <ClInclude Include="Encode.h" />
     <ClInclude Include="PrePrintDlg.h" />

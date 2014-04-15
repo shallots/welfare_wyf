@@ -37,7 +37,7 @@ public:
 	// 编码排序,返回编码个数
 	int ordering();
 	// 杀码，返回杀码个数
-	int killCode(vector<int>,vector<int>,vector<int>,vector<Gossip>);
+	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
 	// 筛选和值
 	int siftPlus(int min, int max);
 

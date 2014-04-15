@@ -78,7 +78,7 @@ BOOL CWelfareApp::InitInstance()
 	// 更改用于存储设置的注册表项
 	// TODO: 应适当修改该字符串，
 	// 例如修改为公司或组织名
-	SetRegistryKey(_T("中国福彩3D码预测助手"));
+	SetRegistryKey(_T("我要发518"));
 	// 分析自动化开关或注册/注销开关的命令行。
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);

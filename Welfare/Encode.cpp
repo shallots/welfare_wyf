@@ -219,7 +219,7 @@ int Encode::ordering()
 	return 1;
 }
 
-int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<Gossip> gossip)
+int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
 {
 	if(!codeFlag)
 	{
@@ -231,6 +231,8 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	sort(plustail.begin(),plustail.end());
 	sort(boldcode.begin(),boldcode.end());
 	sort(hdr.begin(),hdr.end());
+	sort(decade.begin(),decade.end());
+	sort(unit.begin(),unit.end());
 
 	//  和尾值杀码,算法有待优化
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
@@ -289,6 +291,32 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 			for(vector<int>::iterator it=hdr.begin(); it!=hdr.end(); it++)
 			{
 				if(itcode->codeSeq[0] == *it)
+				{
+					flag = true;
+					break;
+				}else{
+					flag = false;
+				}
+			}
+		}
+		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() && !hdr.size() &&decade.size()))
+		{
+			for(vector<int>::iterator it=decade.begin(); it!=decade.end(); it++)
+			{
+				if(itcode->codeSeq[1] == *it)
+				{
+					flag = true;
+					break;
+				}else{
+					flag = false;
+				}
+			}
+		}
+		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() && !hdr.size() && !decade.size() &&unit.size()))
+		{
+			for(vector<int>::iterator it=unit.begin(); it!=unit.end(); it++)
+			{
+				if(itcode->codeSeq[2] == *it)
 				{
 					flag = true;
 					break;

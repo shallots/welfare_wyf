@@ -10,12 +10,43 @@
 #include "PrePrintDlg.h"
 #include <iostream>
 #include <fstream>
+
+#include "CApplication.h"
+#include "CMyDocument.h"
+#include "CDocuments.h"
+#include "CMyFont.h"
+#include "CRange.h"
+#include "CSelection.h"
+#include "CParagraphFormat.h"
+#include "CParagraph.h"
+#include "CParagraphs.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 #define MAXSIZE 10
 
+
+enum WdUnits
+{
+    wdCharacter = 1, // 字母
+    wdWord = 2, // 单词
+    wdSentence = 3, // 句子
+    wdParagraph = 4, // 段落
+    wdLine = 5, // 行
+    wdStory = 6, // 所选区域
+    wdScreen = 7, // 当前屏幕
+    wdSection = 8, // 部分
+    wdColumn = 9, // 列
+    wdRow = 10, // 行
+    wdWindow = 11, // 窗口
+    wdCell = 12, // 单元格
+    wdCharacterFormatting = 13, // 字体格式
+    wdParagraphFormatting = 14, // 段落格式
+    wdTable = 15, // 表格
+    wdItem = 16 // 项目
+};
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -101,6 +132,8 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_KILLPAIR, m_killPair);
 	DDX_Control(pDX, IDC_GROUPC, m_groupChoose);
 	DDX_Control(pDX, IDC_HUNDRED, m_hundred);
+	DDX_Control(pDX, IDC_DECADE, m_decade);
+	DDX_Control(pDX, IDC_UNIT, m_unit);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -207,7 +240,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.04.09)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.04.15)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -484,19 +517,22 @@ void CWelfareDlg::OnBnClickedKillcode()
 		return;
 	}
 	vector<Gossip> gossip;
-	vector<int> arrkc[3];
-	CString csstr[3];
+	vector<int> arrkc[5];
+	CString csstr[5];
 	CString sgossip;
 
 	m_plusTail.GetWindowTextW(csstr[0]);
 	m_boldCode.GetWindowTextW(csstr[1]);
 	m_hundred.GetWindowTextW(csstr[2]);
+	m_decade.GetWindowTextW(csstr[3]);
+	m_unit.GetWindowTextW(csstr[4]);
 	m_twoCode.GetWindowTextW(sgossip);
 	int count = 0;
 	if(csstr[0].GetLength()||csstr[1].GetLength()
-		|| sgossip.GetLength()||csstr[2].GetLength())
+		|| sgossip.GetLength()||csstr[2].GetLength()||csstr[3].GetLength()
+		||csstr[4].GetLength())
 	{
-		for(int i=0; i<3; i++)
+		for(int i=0; i<5; i++)
 		{
 			int length = csstr[i].GetLength();
 			char *p = (LPSTR)(LPCTSTR)csstr[i];
@@ -528,7 +564,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 				k += 2;
 			}
 		}
-		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],gossip);
+		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],arrkc[4],gossip);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
@@ -632,48 +668,47 @@ void CWelfareDlg::OnBnClickedExport()
 		m_REInfo.SetWindowTextW(_T("未预测或列表编码为空"));
 		return;
 	}
+
+	m_REInfo.SetWindowTextW(_T("预测报表正在生成中,请稍后..."));
+
 	//过滤器
-	TCHAR szFilter[] = _T("Word文件(*.doc)|*.doc|文本文件(*.txt)|*.txt|所有文件(*.*)|*.*||");
-	
-	TCHAR *filename = NULL;
+	//TCHAR szFilter[] = _T("Word文件(*.doc)|*.doc|文本文件(*.txt)|*.txt|所有文件(*.*)|*.*||");
+	//TCHAR szFilter[] = _T("Word文件(*.doc)|*.doc||");
+	//
+	//TCHAR *filename = NULL;
 	CString cf;
 	m_issue.GetWindowTextW(cf);
 	int issue = 888;
 	if(cf.GetLength())
 	{
 		issue = _ttoi(cf);
-		cf += _T("期3D码预测");
-		filename = cf.GetBuffer(cf.GetLength());
+		//cf += _T("期3D码预测");
+		//filename = cf.GetBuffer(cf.GetLength());
 	}
 
-	CFileDialog f_Export(FALSE,
-		_T("doc"),
-		filename,
-		OFN_OVERWRITEPROMPT |OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_CREATEPROMPT,
-		szFilter,
-		this);	
-	CString fpath;
+	//CFileDialog f_Export(FALSE,
+	//	_T("doc"),
+	//	filename,
+	//	OFN_OVERWRITEPROMPT |OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_CREATEPROMPT,
+	//	szFilter,
+	//	this);	
+	//CString fpath;
 	//char Buf[255];
 	//WCHAR *pChar;
-	if(f_Export.DoModal() == IDOK)
-	{
-		fpath = f_Export.GetPathName();
-	}else{
-		MessageBox(_T("请输入导出文件名"),_T("导出"),MB_OK);
-		return;
-	}
-	CFile fout(fpath,CFile::modeCreate | CFile::modeReadWrite);
-	fout.Write("\xff\xfe",2);
 
-	CString str;
-	str.Format(_T("\t\t\t\t\t第 %d 期 福彩3D码预测打印报表\n\t\t共计 %d 注3D码,报表由 我要发·518 导出！！\n\n"),issue,count);
-	fout.Write(str,sizeof(TCHAR)*str.GetLength());
-	
+	//if(f_Export.DoModal() == IDOK)
+	//{
+	//	fpath = f_Export.GetPathName();
+	//}else{
+	//	MessageBox(_T("请输入导出文件名"),_T("导出"),MB_OK);
+	//	return;
+	//}
+
 	vector<CString> pairCode;
 	vector<CString> nonpairCode;
 
 	CString spacestr = _T("      ");
-	CString separator = _T("\n+++++++++++++++++++++++++++++++\n");
+	CString separator = _T("\n-------------------------------");
 
 	// 统计分类
 	for(int i=0; i<count; ++i)
@@ -689,37 +724,106 @@ void CWelfareDlg::OnBnClickedExport()
 		}else{
 			nonpairCode.push_back(tmp);
 		}
-		/*
-		wchar_t *ptr;
-		char buf[16];
-		ptr = tmp.GetBuffer(tmp.GetLength());
-		WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)ptr, -1, buf, sizeof(buf), NULL, NULL); 
-		fout.Write(buf,strlen(buf));
-		fout.Write("      ",strlen("      "));
-		*/
-		//fout.Write(tmp,sizeof(TCHAR)*tmp.GetLength());
-		//fout.Write(spacestr,sizeof(TCHAR)*spacestr.GetLength());
 	}
-	/*
-	memset(str,0,sizeof(str));
-	sprintf(str,"( 非对子: %d 注 )",count - pairCode.size());
-	fout.Write(str,strlen(str));
-	*/
 
+	// 定义word操作变量
+	COleVariant  vTrue((short)TRUE),  
+                  vFalse((short)FALSE),  
+                  vopt((long)DISP_E_PARAMNOTFOUND,  VT_ERROR); 	
+	CApplication oWordApp ; 
+	CSelection oSel ;  
+	CDocuments oDocs ; 
+	CMyDocument oDoc ; 
+	CParagraphs paragraphs;
+
+	//WdUnits fv;
+
+	if (!oWordApp.CreateDispatch(_T("Word.Application")) ){ 
+		AfxMessageBox( _T( "word初始化失败！" ) , MB_OK & MB_SETFOREGROUND);  
+		return;  // 返回，否则程序崩溃 
+	}
+	// 先不显示
+	oWordApp.put_Visible(false);
+
+	oDocs = oWordApp.get_Documents(); 
+	oDoc = oDocs.Add(vopt,vopt,vopt,vopt);
+	oSel = oWordApp.get_Selection();
+	oSel.WholeStory();
+	
+	CParagraphFormat cformat = oSel.get_ParagraphFormat();
+	cformat.put_Alignment(0);
+
+	CMyFont font = oSel.get_Font();
+	CString str;
+	str.Format(_T("\t\t\t\t\t第 %d 期 福彩3D码预测打印报表\n"),issue);	
+	font.put_Name(_T("黑体"));
+	font.put_Size(18);
+	oSel.TypeText(str);
+	str.Format(_T("\t\t\t\t\t\t共计 %d 注3D码,本报表由 我要发·518 导出！！\n"),count);
+	font.put_Name(_T("宋体"));
+	font.put_Size(12);
+	oSel.TypeText(str);
+	oSel.TypeParagraph();
+	font.put_Size(14);
+
+	font.put_Size( 12 );
+	str.Format(_T("※ 对子: %d 注 "),pairCode.size());
+	oSel.TypeText(str);
+	oSel.TypeText(separator);
+	font.put_Size( 14 );
+	oSel.TypeParagraph();
+
+
+	// 导出对子
+	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
+	{
+		CString tmp = *it;
+		oSel.TypeText(tmp);
+		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
+		font.put_Size( 10 );
+		oSel.MoveRight(COleVariant((short)2),COleVariant((short)1),COleVariant((short)0));
+		font.put_Size( 14 );
+		oSel.TypeText(spacestr);
+	}
+	font.put_Size( 12 );
+	str.Format(_T(" \n\n※ 非对子: %d 注 "),nonpairCode.size());
+	oSel.TypeText(str);
+	oSel.TypeText(separator);
+	font.put_Size( 14 );
+	oSel.TypeParagraph();
+
+	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++)
+	{
+		CString tmp = *it;
+		oSel.TypeText(tmp);
+		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
+		font.put_Size( 10 );
+		oSel.MoveRight(COleVariant((short)2),COleVariant((short)1),COleVariant((short)0));
+		font.put_Size( 14 );
+		oSel.TypeText(spacestr);
+	}
+	pairCode.clear();
+	
+	CString stat;
+	stat.Format(_T("预测已经导出,3D码:%d 注"),count);
+	m_REInfo.SetWindowTextW(stat);
+
+	// 显示报表
+	oWordApp.put_Visible(true);
+	/*
+	CFile fout(fpath,CFile::modeCreate | CFile::modeReadWrite);
+	fout.Write("\xff\xfe",2);
+
+	CString str;
+	str.Format(_T("\t\t\t\t\t第 %d 期 福彩3D码预测打印报表\n\t\t共计 %d 注3D码,报表由 我要发·518 导出！！\n\n"),issue,count);
+	fout.Write(str,sizeof(TCHAR)*str.GetLength());
+	
 	str.Format(_T("※ 对子: %d 注 "),pairCode.size());
 	fout.Write(str,sizeof(TCHAR)*str.GetLength());
 	// 打印对子
 	fout.Write(separator,sizeof(TCHAR)*separator.GetLength());
 	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
 	{
-		/*
-		wchar_t *ptr;
-		char buf[16];
-		ptr = (*it).GetBuffer((*it).GetLength());
-		WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)ptr, -1, buf, sizeof(buf), NULL, NULL); 
-		fout.Write(buf,strlen(buf));
-		fout.Write("      ",strlen("      "));
-		*/
 		CString tmp = *it;
 		fout.Write(tmp,sizeof(TCHAR)*tmp.GetLength());
 		fout.Write(spacestr,sizeof(TCHAR)*spacestr.GetLength());
@@ -742,6 +846,7 @@ void CWelfareDlg::OnBnClickedExport()
 	stat.Format(_T("文件已经导出,3D码:%d 注，位置:"),count);
 	stat += fpath;
 	m_REInfo.SetWindowTextW(stat);
+	*/
 }
 
 

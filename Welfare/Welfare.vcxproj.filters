@@ -58,6 +58,36 @@
     <ClInclude Include="PrePrintDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CApplication.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CMyDocument.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CMyFont.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CDocuments.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CRange.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CSection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CSelection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CParagraphs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CParagraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CParagraphFormat.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Welfare.cpp">
