@@ -134,6 +134,8 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_HUNDRED, m_hundred);
 	DDX_Control(pDX, IDC_DECADE, m_decade);
 	DDX_Control(pDX, IDC_UNIT, m_unit);
+	DDX_Control(pDX, IDC_DShou, m_dshou);
+	DDX_Control(pDX, IDC_DECheck, m_deCheck);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -168,6 +170,9 @@ ON_LBN_SELCHANGE(IDC_LISTCODE, &CWelfareDlg::OnSelchangeListcode)
 //ON_BN_CLICKED(IDC_KILLPAIR, &CWelfareDlg::OnBnClickedKillpair)
 ON_BN_CLICKED(IDC_KILLODDEVEN, &CWelfareDlg::OnBnClickedKilloddeven)
 ON_BN_CLICKED(IDC_KILLBIGLITTLE, &CWelfareDlg::OnBnClickedKillbiglittle)
+ON_EN_CHANGE(IDC_DShou, &CWelfareDlg::OnEnChangeDshou)
+ON_EN_SETFOCUS(IDC_DShou, &CWelfareDlg::OnSetfocusDshou)
+ON_BN_CLICKED(IDC_DECheck, &CWelfareDlg::OnClickedDecheck)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -208,6 +213,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	m_arr4.SetLimitText(10);
 	m_checkTip.SetCheck(1);
 	m_groupChoose.SetCheck(0);
+	m_deCheck.EnableWindow(false);
 	// test
 	//m_listCode.AddString(_T("234-9"),RGB(154,50,205));
 	//m_sift.SetCheck(TRUE);
@@ -233,6 +239,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	  TRACE0( "Failed   to   create   status   bar/n "); 
 	  return FALSE;             //   fail   to   create 
 	 } 
+
 	 m_StatusBar.SetPaneInfo(1,ID_SEPARATOR,SBPS_NORMAL,240); 
 	 m_StatusBar.ShowWindow(SW_SHOW); 
 	 CRect   rect; 
@@ -240,7 +247,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.04.15)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.06.07)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -475,10 +482,13 @@ void CWelfareDlg::OnBnClickedForcast()
 			arr[3].clear();
 		}
 		// 组选
-		if(m_groupChoose.GetCheck())
-		{
-			ec->groupChoose();
-		}
+		//if( m_groupChoose.GetCheck())
+		//{
+		//	ec->groupChoose();
+		//}
+
+		ec->groupChoose();
+
 		// 和值尾有序化
 		ec->ordering();
 		
@@ -493,7 +503,7 @@ void CWelfareDlg::OnBnClickedForcast()
 		totalCodeCount = ec->dvCode.size();
 		CString stat;
 		// 组选
-		if(m_groupChoose.GetCheck())
+		if(true||m_groupChoose.GetCheck())
 		{
 			stat.Format(_T("组选：初步预测3D码数: %d注。"),ec->dvCode.size());
 			m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));
@@ -502,6 +512,7 @@ void CWelfareDlg::OnBnClickedForcast()
 			m_StatusBar.SetPaneText(0,_T("组码规则: 直选"));		
 		}		
 		m_REInfo.SetWindowTextW(stat);
+		m_deCheck.EnableWindow(true);
 	}else{
 		m_REInfo.SetWindowTextW(_T("输入数据不完整,请仔细检查!"));
 	}
@@ -564,32 +575,36 @@ void CWelfareDlg::OnBnClickedKillcode()
 				k += 2;
 			}
 		}
+
 		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],arrkc[4],gossip);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
-	// 杀掉对子
-	/*
-	int pairNum = 0;
-	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
-	{
-		if(it->codeSeq[0]==it->codeSeq[1] || it->codeSeq[1] == it->codeSeq[2]
-		|| it->codeSeq[0]== it->codeSeq[2])
-		{
-			it = ec->dvCode.erase(it);
-			pairNum ++ ;
-			continue;
-		}
-		it++;
+
+	// 解析钓叟码
+	CString dshouStr;
+	m_dshou.GetWindowTextW(dshouStr);
+	// 待转换CString变量
+	wchar_t *ptrx;             
+	char bufx[256];        // 目标存储空间
+	memset(bufx,'\0',256);
+	int dslength = dshouStr.GetLength()>255?255:dshouStr.GetLength();
+	ptrx=dshouStr.GetBuffer(dslength*sizeof(wchar_t));
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrx, -1, bufx, sizeof(bufx), NULL, NULL);
+	int  dsSelCount=0;
+	int selStrlen = strlen(bufx);
+	// 钓叟选码
+	if(selStrlen > 0){
+		
+		dsSelCount = ec->dsSelect(bufx);
 	}
-	*/
 
 	m_listCode.ResetContent();
 	int siftCount = 0;
 	int oeCount = 0;
 	int blCount = 0;
 	int flag = m_sift.GetCheck();
-	
+
 	// 
 	for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); )
 	{
@@ -618,8 +633,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 		// 杀全大全小
 		if(m_killABL.GetCheck())
 		{
-			if((it->codeSeq[0]>5 && it->codeSeq[1]>5 && it->codeSeq[2] >5) || 
-				(it->codeSeq[0]<5 && it->codeSeq[1]<5 && it->codeSeq[2]<5))
+			if(isExtreme(it))
 			{
 				blCount++;
 				it = ec->dvCode.erase(it);
@@ -633,12 +647,11 @@ void CWelfareDlg::OnBnClickedKillcode()
 		it++;
 	}
 
-	
 	CString ts;
-	if((siftCount|oeCount|blCount) != 0)
+	if((siftCount|oeCount|blCount|dsSelCount) != 0)
 	{
 		int delTotal = count+siftCount+oeCount+blCount;
-		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,\n其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,count, ec->dvCode.size());
+		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,\n钓叟：%d注，其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,dsSelCount,count, ec->dvCode.size());
 	}else
 		ts.Format(_T("杀码 %d 注，选出 %d 注."),count,ec->dvCode.size());
 	m_REInfo.SetWindowTextW(ts);
@@ -657,6 +670,48 @@ BOOL IsPair(CString code)
 	return false;
 }
 
+BOOL IsPair(vector<CodeType>::iterator it){
+	if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1]==it->codeSeq[2]
+	||it->codeSeq[0] == it->codeSeq[2]){
+		return true;
+	}
+	return false;
+}
+
+
+//void genThree(vector<CodeType>::iterator it,vector<CString>& list){
+//	int code[2];
+//	if(it->codeSeq[0] == it->codeSeq[1]){
+//		code[0] = it->codeSeq[0];
+//		code[1] = it->codeSeq[2];
+//	}else{
+//		code[0] = it->codeSeq[0];
+//		code[1] = it->codeSeq[1];
+//	}
+//	CString tmp;
+//	tmp.Format(_T("%d%d%d-%d"),code[0],code[0],code[1],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),code[0],code[1],code[0],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),code[1],code[0],code[0],it->mantissa);
+//	list.push_back(tmp);
+//}
+//
+//void genSix(vector<CodeType>::iterator it,vector<CString>& list){
+//	CString tmp;
+//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[2],it->codeSeq[1],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[1],it->codeSeq[0],it->codeSeq[2],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[1],it->codeSeq[2],it->codeSeq[0],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[2],it->codeSeq[1],it->codeSeq[0],it->mantissa);
+//	list.push_back(tmp);
+//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[2],it->codeSeq[0],it->codeSeq[1],it->mantissa);
+//	list.push_back(tmp);
+//}
 void CWelfareDlg::OnBnClickedExport()
 {
 	int count = m_listCode.GetCount();
@@ -686,24 +741,6 @@ void CWelfareDlg::OnBnClickedExport()
 		//filename = cf.GetBuffer(cf.GetLength());
 	}
 
-	//CFileDialog f_Export(FALSE,
-	//	_T("doc"),
-	//	filename,
-	//	OFN_OVERWRITEPROMPT |OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_CREATEPROMPT,
-	//	szFilter,
-	//	this);	
-	//CString fpath;
-	//char Buf[255];
-	//WCHAR *pChar;
-
-	//if(f_Export.DoModal() == IDOK)
-	//{
-	//	fpath = f_Export.GetPathName();
-	//}else{
-	//	MessageBox(_T("请输入导出文件名"),_T("导出"),MB_OK);
-	//	return;
-	//}
-
 	vector<CString> pairCode;
 	vector<CString> nonpairCode;
 
@@ -711,16 +748,41 @@ void CWelfareDlg::OnBnClickedExport()
 	CString separator = _T("\n-------------------------------");
 
 	// 统计分类
-	for(int i=0; i<count; ++i)
-	{
-		CString tmp;
-		m_listCode.GetText(i,tmp);
+	//for(int i=0; i<count; ++i)
+	//{
+	//	CString tmp;
+	//	m_listCode.GetText(i,tmp);
 
-		
-		if(IsPair(tmp))
-		{
+	//	
+	//	if(IsPair(tmp))
+	//	{
+	//		pairCode.push_back(tmp);
+	//		//continue;
+	//	}else{
+	//		nonpairCode.push_back(tmp);
+	//	}
+	//}
+
+	// 根据 ec->dvCode 组码
+	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it!=ec->dvCode.end(); it++){
+		CString tmp;
+		//if(m_deCheck.GetCheck()){
+		//	if(IsPair(it)){
+		//		genThree(it,pairCode);
+		//	}else{
+		//		genSix(it,nonpairCode);
+		//	}
+		//}else{
+		//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		//	if(IsPair(it)){
+		//		pairCode.push_back(tmp);
+		//	}else{
+		//		nonpairCode.push_back(tmp);
+		//	}
+		//}
+		tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		if(IsPair(it)){
 			pairCode.push_back(tmp);
-			//continue;
 		}else{
 			nonpairCode.push_back(tmp);
 		}
@@ -803,50 +865,15 @@ void CWelfareDlg::OnBnClickedExport()
 		oSel.TypeText(spacestr);
 	}
 	pairCode.clear();
-	
+	nonpairCode.clear();
+
 	CString stat;
 	stat.Format(_T("预测已经导出,3D码:%d 注"),count);
 	m_REInfo.SetWindowTextW(stat);
 
 	// 显示报表
 	oWordApp.put_Visible(true);
-	/*
-	CFile fout(fpath,CFile::modeCreate | CFile::modeReadWrite);
-	fout.Write("\xff\xfe",2);
-
-	CString str;
-	str.Format(_T("\t\t\t\t\t第 %d 期 福彩3D码预测打印报表\n\t\t共计 %d 注3D码,报表由 我要发·518 导出！！\n\n"),issue,count);
-	fout.Write(str,sizeof(TCHAR)*str.GetLength());
 	
-	str.Format(_T("※ 对子: %d 注 "),pairCode.size());
-	fout.Write(str,sizeof(TCHAR)*str.GetLength());
-	// 打印对子
-	fout.Write(separator,sizeof(TCHAR)*separator.GetLength());
-	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
-	{
-		CString tmp = *it;
-		fout.Write(tmp,sizeof(TCHAR)*tmp.GetLength());
-		fout.Write(spacestr,sizeof(TCHAR)*spacestr.GetLength());
-	}
-
-	str.Format(_T(" \n\n※ 非对子: %d 注 "),nonpairCode.size());
-	fout.Write(str,sizeof(TCHAR)*str.GetLength());
-	fout.Write(separator,sizeof(TCHAR)*separator.GetLength());
-	// 打印非对子
-	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++)
-	{
-		CString tmp = *it;
-		fout.Write(tmp,sizeof(TCHAR)*tmp.GetLength());
-		fout.Write(spacestr,sizeof(TCHAR)*spacestr.GetLength());
-	}
-	pairCode.clear();
-	
-	fout.Close();
-	CString stat;
-	stat.Format(_T("文件已经导出,3D码:%d 注，位置:"),count);
-	stat += fpath;
-	m_REInfo.SetWindowTextW(stat);
-	*/
 }
 
 
@@ -872,6 +899,9 @@ void CWelfareDlg::OnBnClickedReset()
 	m_REInfo.SetWindowTextW(_T(""));
 	m_hundred.SetWindowTextW(_T(""));
 	m_groupChoose.EnableWindow(true);
+	m_dshou.SetWindowTextW(_T(""));
+	m_deCheck.EnableWindow(false);
+	m_deCheck.SetCheck(false);
 	m_StatusBar.SetPaneText(0,_T("欢迎使用！"));
 	forcastFlag = FALSE;
 }
@@ -1095,7 +1125,23 @@ void CWelfareDlg::OnBnClickedKilloddeven()
 	}
 
 }
-
+// 判定全大全小
+BOOL isExtreme(const vector<CodeType>::iterator it){
+	int high = 0;
+	int low = 0;
+	for(int i=0; i<3; i++){
+		if(it->codeSeq[i] == 0 || it->codeSeq[i]>5){
+			high++;
+		}else{
+			low++;
+		}
+	}
+	if(high == 3 || low == 3){
+		return true;
+	}else{
+		return false;
+	}
+}
 
 void CWelfareDlg::OnBnClickedKillbiglittle()
 {
@@ -1111,8 +1157,9 @@ void CWelfareDlg::OnBnClickedKillbiglittle()
 		m_listCode.ResetContent();
 		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
 		{
-			if((it->codeSeq[0]>5 && it->codeSeq[1]>5 && it->codeSeq[2]>5) || 
-				(it->codeSeq[0]<5 && it->codeSeq[1]<5 && it->codeSeq[2]<5))
+			//if((it->codeSeq[0]>5 && it->codeSeq[1]>5 && it->codeSeq[2]>5) || 
+			//	(it->codeSeq[0]<5 && it->codeSeq[1]<5 && it->codeSeq[2]<5))
+			if(isExtreme(it))
 			{
 				delCount++;
 				it = ec->dvCode.erase(it);
@@ -1166,4 +1213,43 @@ CString CWelfareDlgGetFileVer()
  }
  */
  return _T("");
+}
+
+void CWelfareDlg::OnEnChangeDshou()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CWelfareDlg::OnSetfocusDshou()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_REInfo.SetWindowTextW(_T("可输入任意组钓叟码，中间用#、/、*等字符隔开，例如：\n\t168#2518#56789\n\t123456 32457 45678"));
+}
+
+// 转换为直选
+void CWelfareDlg::OnClickedDecheck()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if(forcastFlag && m_deCheck.GetCheck()){
+		ec->grouptodirect();
+
+		m_listCode.ResetContent();
+		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
+		{
+			CString tmp;
+			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+			m_listCode.AddString(tmp);
+			it++;
+		}
+
+		CString info;
+		info.Format(_T("已转换为直选，共 %d 注3D码!!"),ec->dvCode.size());
+		m_REInfo.SetWindowTextW(info);
+	}
 }

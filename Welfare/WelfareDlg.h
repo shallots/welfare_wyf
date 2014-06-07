@@ -120,5 +120,11 @@ public:
 	CEdit m_hundred;
 	CEdit m_decade;
 	CEdit m_unit;
+	CEdit m_dshou;
+	CButton m_deCheck;
+	afx_msg void OnEnChangeDshou();
+	afx_msg void OnSetfocusDshou();
+	afx_msg void OnClickedDecheck();
 };
 int isInSift(CString code);
+BOOL isExtreme(const vector<CodeType>::iterator it);

@@ -4,12 +4,70 @@ using std::sort;
 Encode::Encode()
 {
 	codeFlag = false;
+	codetype = GROUP;
 }
 
 Encode::~Encode()
 {
 	eraseCode();
 }
+
+/*********************************************************
+*	名称：三向量编码函数
+*	功能：使用三组整数向量进行编码
+*	参数：
+*		da,第一组整数向量；db，第二组整数向量；dc，第三组整数向量
+*	作者:Hyw
+*	日期:14/06/04
+*	说明:新版要求组选杀码，最后可导出直选，编码预测码时先生成二码
+*********************************************************/
+int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
+{
+	//  暂未写异常处理
+	if(codeFlag)
+	{
+		return 0;
+	}
+	if(!(da.size() && db.size() && dc.size()))
+	{
+		return -1;
+	}
+
+	// 直选编码
+	vector<int> *data[3];
+	data[0] = &da;
+	data[1] = &db;
+	data[2] = &dc;
+	int i=0;
+	int k=0;
+	for(i=0; i<3; i++)
+	{
+		for(vector<int>::iterator ita = data[i]->begin(); ita != data[i]->end(); ita++)
+		{
+			for(k=i+1;k<3;k++)
+			{
+				for(vector<int>::iterator itc = data[k]->begin(); itc != data[k]->end(); itc++)
+				{
+					CodeType tmp;
+					tmp.codeSeq[0] = *ita;
+					tmp.codeSeq[1] = *itc;
+					for(int j=0;j<=9;j++){
+						tmp.codeSeq[2] = j;
+						int codeSum = (*ita + j + *itc);
+						tmp.mantissa = codeSum % 10;
+						dvCode.push_back(tmp);
+					}
+				}
+			}
+		}
+	}
+	de_weight();
+	if(codetype == GROUP)
+		groupChoose();
+	codeFlag = true;
+	return dvCode.size();
+}
+
 /*********************************************************
 *	名称：三向量编码函数
 *	功能：使用三组整数向量进行编码
@@ -17,7 +75,9 @@ Encode::~Encode()
 *		da,第一组整数向量；db，第二组整数向量；dc，第三组整数向量
 *	作者:Hyw
 *	日期:13/05/13
+*   注释: 新版本，先生成两码再生成3码，故此函数废弃
 *********************************************************/
+/*
 int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 {
 	//  暂未写异常处理
@@ -72,6 +132,7 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 	codeFlag = true;
 	return dvCode.size();
 }
+*/
 
 /*********************************************************
 *	名称：四向量编码函数
@@ -215,7 +276,7 @@ int Encode::ordering()
 {
 	if(!codeFlag)
 		return 0;
-	sort(dvCode.begin(),dvCode.end(),comp2);
+	sort(dvCode.begin(),dvCode.end(),comp);
 	return 1;
 }
 
@@ -338,12 +399,186 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	return count;
 }
 
+/********************************
+* 将字符串序列转化为整数向量
+*
+*********************************/
+vector<int*> parseSeq(char *dsSeqx){
+	vector<int*> seq;
+	int *ptr = new int[10];
+	for(int m=0;m<10;m++){
+		*(ptr+m) = -1;
+	}
+	int j=0,i=0;
+	for( i=0; dsSeqx[i] != '\0';i++){
+		if(dsSeqx[i]>'9' || dsSeqx[i] < '0')
+		{
+			if(ptr[0]!=-1){
+				seq.push_back(ptr);
+				j=0;
+				ptr = new int[10];
+				for(int m=0;m<10;m++){
+					*(ptr+m) = -1;
+				}
+			}
+			continue;
+		}
+		ptr[j] = dsSeqx[i] - '0';
+		j++;
+	}
+	if(ptr[0] != -1){
+		seq.push_back(ptr);
+	}else
+		delete []ptr;
+	return seq;	
+}
+
+
+/********************************
+* 当预测码有两个及两个以上数字在给定序列中时，
+* 返回true，否则返回false
+*********************************/
+bool isInSeq(vector<CodeType>::iterator it, int* ptr){
+	int i=0;
+	int flag = 0;
+	while(ptr[i] != -1 && i<10){
+		if(ptr[i] == it->codeSeq[0] || ptr[i] == it->codeSeq[1] || ptr[i] == it->codeSeq[2])
+			flag ++;
+		i++;
+	}
+	if(flag >1)
+		return true;
+	else
+		return false;
+}
+
+/********************************
+* 钓叟选码函数
+*********************************/
+int Encode::dsSelect(char *dsxSeq){
+	if(strlen(dsxSeq)<1){
+		return 0;
+	}
+	int count = 0;
+	vector<int*> seq = parseSeq(dsxSeq);
+	for(vector<CodeType>::iterator it= dvCode.begin(); it!=dvCode.end();){
+		bool flag = false;
+		for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++){
+			int* ptr = *itd;
+			if(isInSeq(it,ptr)){
+				flag = true;
+				break;
+			}
+		}
+
+		if(flag){
+			it++;	
+		}else{
+			it = dvCode.erase(it);
+			count++;
+		}
+	}
+	delete []dsxSeq;
+	for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++ ){
+		delete [] (*itd);
+	}
+	seq.clear();
+	return count;
+}
+
+void copydvCode(vector<CodeType> ct, vector<CodeType> &dv){
+	dv.clear();
+	for(vector<CodeType>::iterator it=ct.begin(); it!=ct.end(); it++){
+		dv.push_back(*it);
+	}
+}
+
+void genThree(vector<CodeType>::iterator it,vector<CodeType>& list){
+	//list.push_back(*it);
+	int code[2];
+	if(it->codeSeq[0] == it->codeSeq[1]){
+		if(it->codeSeq[0] == it->codeSeq[2]){
+			return;
+		}
+		code[0] = it->codeSeq[0];
+		code[1] = it->codeSeq[2];
+	}else{
+		if(it->codeSeq[0] == it->codeSeq[2]){
+			code[0] = it->codeSeq[0];
+			code[1] = it->codeSeq[1];
+		}else{
+			code[0] = it->codeSeq[1];
+			code[1] = it->codeSeq[0];
+		}
+	}
+	for(int i=0; i<3; i++){
+		CodeType tc;
+		tc.codeSeq[i] = code[1];
+		tc.codeSeq[(i+1)%3] = code[0];
+		tc.codeSeq[(i+2)%3] = code[0];
+		tc.mantissa = it->mantissa;
+		list.push_back(tc);
+	}
+}
+
+void genSix(vector<CodeType>::iterator it,vector<CodeType>& list){
+	for(int i=0; i<3; i++){
+		for(int j=0; j<3; j++){
+			if(j==i)
+				continue;
+			for(int k=0; k<3; k++){
+				if(k==i || k==j)
+					continue;
+				CodeType ct;
+				ct.codeSeq[0] = it->codeSeq[i];
+				ct.codeSeq[1] = it->codeSeq[j];
+				ct.codeSeq[2] = it->codeSeq[k];
+				ct.mantissa = it->mantissa;
+				list.push_back(ct);
+			}
+		}
+	}
+}
+int Encode::grouptodirect(){
+	if(codetype == DIRECT)
+		return dvCode.size();
+	vector<CodeType> dCode;
+
+	for(vector<CodeType>::iterator it=dvCode.begin(); it!=dvCode.end(); it++){
+		if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1]==it->codeSeq[2]
+			||it->codeSeq[0] == it->codeSeq[2]){
+			genThree(it,dCode);
+		}else{
+			genSix(it,dCode);
+		}
+	}
+	copydvCode(dCode,dvCode);
+
+	dCode.clear();
+	codetype = DIRECT;
+	return dvCode.size();
+}
+
+int Encode::getCodeType(){
+	return codetype;
+}
+
+int Encode::setCodeType(int ct){
+	if(ct == 1 || ct == 0)
+	{
+		codetype = ct;
+		return codetype;
+	}else{
+		return -1;
+	}
+}
 void Encode::eraseCode()
 {
 	if(!codeFlag)
 		return;
 	dvCode.clear();
 	codeFlag = false;
+	codetype = GROUP;
 }
 
 
