@@ -51,6 +51,9 @@ public:
 	// 钓叟选码
 	int dsSelect(char *dsSequence);
 	
+	// 杀大和
+	int killBig(int big=20);
+
 	// 获得组码类型
 	int getCodeType();
 	// 设置组码类型

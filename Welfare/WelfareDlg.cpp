@@ -136,6 +136,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_UNIT, m_unit);
 	DDX_Control(pDX, IDC_DShou, m_dshou);
 	DDX_Control(pDX, IDC_DECheck, m_deCheck);
+	DDX_Control(pDX, IDC_BIGSUM, m_bigSum);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -173,6 +174,7 @@ ON_BN_CLICKED(IDC_KILLBIGLITTLE, &CWelfareDlg::OnBnClickedKillbiglittle)
 ON_EN_CHANGE(IDC_DShou, &CWelfareDlg::OnEnChangeDshou)
 ON_EN_SETFOCUS(IDC_DShou, &CWelfareDlg::OnSetfocusDshou)
 ON_BN_CLICKED(IDC_DECheck, &CWelfareDlg::OnClickedDecheck)
+ON_BN_CLICKED(IDC_BIGSUM, &CWelfareDlg::OnClickedBigsum)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -247,7 +249,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.06.07)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.06.08)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -599,6 +601,12 @@ void CWelfareDlg::OnBnClickedKillcode()
 		dsSelCount = ec->dsSelect(bufx);
 	}
 
+	// 杀大和
+	int bigCount = 0;
+	if(m_bigSum.GetCheck()){
+		bigCount = ec->killBig();
+	}
+
 	m_listCode.ResetContent();
 	int siftCount = 0;
 	int oeCount = 0;
@@ -648,10 +656,10 @@ void CWelfareDlg::OnBnClickedKillcode()
 	}
 
 	CString ts;
-	if((siftCount|oeCount|blCount|dsSelCount) != 0)
+	if((siftCount|oeCount|blCount|dsSelCount|bigCount) != 0)
 	{
-		int delTotal = count+siftCount+oeCount+blCount;
-		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,\n钓叟：%d注，其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,dsSelCount,count, ec->dvCode.size());
+		int delTotal = count+siftCount+oeCount+blCount+dsSelCount+bigCount;
+		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,大和: %d注,\n钓叟：%d注，其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,bigCount,dsSelCount,count, ec->dvCode.size());
 	}else
 		ts.Format(_T("杀码 %d 注，选出 %d 注."),count,ec->dvCode.size());
 	m_REInfo.SetWindowTextW(ts);
@@ -679,39 +687,6 @@ BOOL IsPair(vector<CodeType>::iterator it){
 }
 
 
-//void genThree(vector<CodeType>::iterator it,vector<CString>& list){
-//	int code[2];
-//	if(it->codeSeq[0] == it->codeSeq[1]){
-//		code[0] = it->codeSeq[0];
-//		code[1] = it->codeSeq[2];
-//	}else{
-//		code[0] = it->codeSeq[0];
-//		code[1] = it->codeSeq[1];
-//	}
-//	CString tmp;
-//	tmp.Format(_T("%d%d%d-%d"),code[0],code[0],code[1],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),code[0],code[1],code[0],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),code[1],code[0],code[0],it->mantissa);
-//	list.push_back(tmp);
-//}
-//
-//void genSix(vector<CodeType>::iterator it,vector<CString>& list){
-//	CString tmp;
-//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[2],it->codeSeq[1],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[1],it->codeSeq[0],it->codeSeq[2],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[1],it->codeSeq[2],it->codeSeq[0],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[2],it->codeSeq[1],it->codeSeq[0],it->mantissa);
-//	list.push_back(tmp);
-//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[2],it->codeSeq[0],it->codeSeq[1],it->mantissa);
-//	list.push_back(tmp);
-//}
 void CWelfareDlg::OnBnClickedExport()
 {
 	int count = m_listCode.GetCount();
@@ -898,10 +873,16 @@ void CWelfareDlg::OnBnClickedReset()
 	m_twoCode.SetWindowTextW(_T(""));
 	m_REInfo.SetWindowTextW(_T(""));
 	m_hundred.SetWindowTextW(_T(""));
+	m_decade.SetWindowTextW(_T(""));
+	m_unit.SetWindowTextW(_T(""));
 	m_groupChoose.EnableWindow(true);
 	m_dshou.SetWindowTextW(_T(""));
 	m_deCheck.EnableWindow(false);
 	m_deCheck.SetCheck(false);
+	m_bigSum.SetCheck(false);
+	m_killABL.SetCheck(false);
+	m_killAOE.SetCheck(false);
+	m_sift.SetCheck(false);
 	m_StatusBar.SetPaneText(0,_T("欢迎使用！"));
 	forcastFlag = FALSE;
 }
@@ -1250,6 +1231,37 @@ void CWelfareDlg::OnClickedDecheck()
 
 		CString info;
 		info.Format(_T("已转换为直选，共 %d 注3D码!!"),ec->dvCode.size());
+		m_StatusBar.SetPaneText(0,_T("组码规则: 直选"));
+		m_REInfo.SetWindowTextW(info);
+	}
+}
+
+// 杀大和
+void CWelfareDlg::OnClickedBigsum()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if(forcastFlag && m_bigSum.GetCheck()){
+
+		if(IDOK != MessageBox(_T("选择是，将杀掉和尾值大于20的3D码？"),_T("杀大和提示"),MB_OKCANCEL))
+		{
+			m_bigSum.SetCheck(FALSE);
+			return;
+		}
+
+		int count = 0;
+		count = ec->killBig(20);
+
+		m_listCode.ResetContent();
+		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
+		{
+			CString tmp;
+			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+			m_listCode.AddString(tmp);
+			it++;
+		}
+
+		CString info;
+		info.Format(_T("大和杀码 %d 注，共 %d 注3D码!!"),count,ec->dvCode.size());
 		m_REInfo.SetWindowTextW(info);
 	}
 }

@@ -559,6 +559,19 @@ int Encode::grouptodirect(){
 	return dvCode.size();
 }
 
+
+int Encode::killBig(int big){
+	int count = 0;
+	for(vector<CodeType>::iterator it=dvCode.begin(); it!=dvCode.end();){
+		if((it->codeSeq[0] + it->codeSeq[1] + it->codeSeq[2])>20){
+			it = dvCode.erase(it);
+			count++;
+		}
+		it++;
+	}
+	return count;
+}
+
 int Encode::getCodeType(){
 	return codetype;
 }

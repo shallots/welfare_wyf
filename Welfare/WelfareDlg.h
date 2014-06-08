@@ -125,6 +125,8 @@ public:
 	afx_msg void OnEnChangeDshou();
 	afx_msg void OnSetfocusDshou();
 	afx_msg void OnClickedDecheck();
+	CButton m_bigSum;
+	afx_msg void OnClickedBigsum();
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);
