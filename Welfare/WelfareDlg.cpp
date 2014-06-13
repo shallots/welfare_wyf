@@ -249,7 +249,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.06.08)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.06.13)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -612,7 +612,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	int oeCount = 0;
 	int blCount = 0;
 	int flag = m_sift.GetCheck();
-
+	int pairCount = 0;
 	// 
 	for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); )
 	{
@@ -649,6 +649,11 @@ void CWelfareDlg::OnBnClickedKillcode()
 			}
 		}
 
+		if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1] == it->codeSeq[2]
+		|| it->codeSeq[0] == it->codeSeq[2])
+		{
+			pairCount ++;
+		}
 		CString tmp;
 		tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
 		m_listCode.AddString(tmp);
@@ -661,7 +666,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 		int delTotal = count+siftCount+oeCount+blCount+dsSelCount+bigCount;
 		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,大和: %d注,\n钓叟：%d注，其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,bigCount,dsSelCount,count, ec->dvCode.size());
 	}else
-		ts.Format(_T("杀码 %d 注，选出 %d 注."),count,ec->dvCode.size());
+		ts.Format(_T("杀码 %d 注，余 %d 注(其中对子 %d 注,非对子 %d 注)."),count,ec->dvCode.size(),pairCount,ec->dvCode.size()-pairCount);
 	m_REInfo.SetWindowTextW(ts);
 }
 
@@ -790,13 +795,20 @@ void CWelfareDlg::OnBnClickedExport()
 	CParagraphFormat cformat = oSel.get_ParagraphFormat();
 	cformat.put_Alignment(0);
 
+	CString codetype;
+	if(ec->getCodeType() == DIRECT){
+		codetype.Format(_T("直选"));
+	}else{
+		codetype.Format(_T("组选"));
+	}
+
 	CMyFont font = oSel.get_Font();
 	CString str;
-	str.Format(_T("\t\t\t\t\t第 %d 期 福彩3D码预测打印报表\n"),issue);	
+	str.Format(_T("\t\t第 %d 期 福彩3D码预测（%s）打印报表\n"),issue,codetype);	
 	font.put_Name(_T("黑体"));
 	font.put_Size(18);
 	oSel.TypeText(str);
-	str.Format(_T("\t\t\t\t\t\t共计 %d 注3D码,本报表由 我要发·518 导出！！\n"),count);
+	str.Format(_T("\t\t\t\t共计 %d 注3D码,本报表由 我要发·518 导出！！\n"),count);
 	font.put_Name(_T("宋体"));
 	font.put_Size(12);
 	oSel.TypeText(str);
