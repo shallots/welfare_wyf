@@ -442,14 +442,69 @@ bool isInSeq(vector<CodeType>::iterator it, int* ptr){
 	int i=0;
 	int flag = 0;
 	while(ptr[i] != -1 && i<10){
-		if(ptr[i] == it->codeSeq[0] || ptr[i] == it->codeSeq[1] || ptr[i] == it->codeSeq[2])
-			flag ++;
+		if(ptr[i] == it->codeSeq[0])
+			flag++;
+		if(ptr[i] == it->codeSeq[1])
+			flag++;
+		if(ptr[i] == it->codeSeq[2])
+			flag++;
 		i++;
 	}
 	if(flag >1)
 		return true;
 	else
 		return false;
+}
+
+bool isInSeq3(vector<CodeType>::iterator it, int* ptr){
+	int i=0;
+	int flag = 0;
+	while(ptr[i] != -1 && i<10){
+		if(ptr[i] == it->codeSeq[0])
+			flag++;
+		if(ptr[i] == it->codeSeq[1])
+			flag++;
+		if(ptr[i] == it->codeSeq[2])
+			flag++;
+		i++;
+	}
+	if(flag >2)
+		return true;
+	else
+		return false;
+}
+/********************************
+* ¶¨ÈýÂëº¯Êý
+*********************************/
+int Encode::tcSelect(char *tcSeq){
+	if(strlen(tcSeq)<1){
+		return 0;
+	}
+	int count = 0;
+	vector<int*> seq = parseSeq(tcSeq);
+	for(vector<CodeType>::iterator it= dvCode.begin(); it!=dvCode.end();){
+		bool flag = false;
+		for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++){
+			int* ptr = *itd;
+			if(isInSeq3(it,ptr)){
+				flag = true;
+				break;
+			}
+		}
+
+		if(flag){
+			it++;	
+		}else{
+			it = dvCode.erase(it);
+			count++;
+		}
+	}
+	delete []tcSeq;
+	for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++ ){
+		delete [] (*itd);
+	}
+	seq.clear();
+	return count;
 }
 
 /********************************

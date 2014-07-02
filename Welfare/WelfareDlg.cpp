@@ -137,6 +137,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DShou, m_dshou);
 	DDX_Control(pDX, IDC_DECheck, m_deCheck);
 	DDX_Control(pDX, IDC_BIGSUM, m_bigSum);
+	DDX_Control(pDX, IDC_THREE, m_three);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -175,6 +176,8 @@ ON_EN_CHANGE(IDC_DShou, &CWelfareDlg::OnEnChangeDshou)
 ON_EN_SETFOCUS(IDC_DShou, &CWelfareDlg::OnSetfocusDshou)
 ON_BN_CLICKED(IDC_DECheck, &CWelfareDlg::OnClickedDecheck)
 ON_BN_CLICKED(IDC_BIGSUM, &CWelfareDlg::OnClickedBigsum)
+ON_EN_CHANGE(IDC_THREE, &CWelfareDlg::OnEnChangeEdit1)
+ON_EN_SETFOCUS(IDC_THREE, &CWelfareDlg::OnSetfocusThree)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -249,7 +252,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.06.13)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.07.02)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -582,6 +585,22 @@ void CWelfareDlg::OnBnClickedKillcode()
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
+	// 解析定三码
+	CString threeStr;
+	m_three.GetWindowTextW(threeStr);
+	// 待转换CString变量
+	wchar_t *ptrz;             
+	char buft[256];        // 目标存储空间
+	memset(buft,'\0',256);
+	int tclength = threeStr.GetLength()>255?255:threeStr.GetLength();
+	ptrz=threeStr.GetBuffer(tclength*sizeof(wchar_t));
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrz, -1, buft, sizeof(buft), NULL, NULL);
+	int  tcSelCount=0;
+	int tclen = strlen(buft);
+	// 定三选码
+	if(tclen > 0){
+		tcSelCount = ec->tcSelect(buft);
+	}
 
 	// 解析钓叟码
 	CString dshouStr;
@@ -661,10 +680,10 @@ void CWelfareDlg::OnBnClickedKillcode()
 	}
 
 	CString ts;
-	if((siftCount|oeCount|blCount|dsSelCount|bigCount) != 0)
+	if((siftCount|oeCount|blCount|dsSelCount|bigCount|tcSelCount) != 0)
 	{
-		int delTotal = count+siftCount+oeCount+blCount+dsSelCount+bigCount;
-		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,大和: %d注,\n钓叟：%d注，其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,bigCount,dsSelCount,count, ec->dvCode.size());
+		int delTotal = count+siftCount+oeCount+blCount+dsSelCount+bigCount+tcSelCount;
+		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,大和: %d注,\n钓叟：%d注，三码: %d 注,其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,bigCount,dsSelCount,tcSelCount,count, ec->dvCode.size());
 	}else
 		ts.Format(_T("杀码 %d 注，余 %d 注(其中对子 %d 注,非对子 %d 注)."),count,ec->dvCode.size(),pairCount,ec->dvCode.size()-pairCount);
 	m_REInfo.SetWindowTextW(ts);
@@ -1276,4 +1295,21 @@ void CWelfareDlg::OnClickedBigsum()
 		info.Format(_T("大和杀码 %d 注，共 %d 注3D码!!"),count,ec->dvCode.size());
 		m_REInfo.SetWindowTextW(info);
 	}
+}
+
+
+void CWelfareDlg::OnEnChangeEdit1()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CWelfareDlg::OnSetfocusThree()
+{
+	m_REInfo.SetWindowTextW(_T("可输入任意组定三码，中间用#、/、*等字符隔开，例如：\n\t168#2518#56789\n\t123456 32457 45678"));
 }

@@ -48,8 +48,12 @@ public:
 	// 筛选和值
 	int siftPlus(int min, int max);
 
+	// 定三码
+	int tcSelect(char *tcSelect);
+
 	// 钓叟选码
 	int dsSelect(char *dsSequence);
+
 	
 	// 杀大和
 	int killBig(int big=20);
