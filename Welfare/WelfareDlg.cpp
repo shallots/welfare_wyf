@@ -10,12 +10,43 @@
 #include "PrePrintDlg.h"
 #include <iostream>
 #include <fstream>
+
+#include "CApplication.h"
+#include "CMyDocument.h"
+#include "CDocuments.h"
+#include "CMyFont.h"
+#include "CRange.h"
+#include "CSelection.h"
+#include "CParagraphFormat.h"
+#include "CParagraph.h"
+#include "CParagraphs.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 #define MAXSIZE 10
 
+
+enum WdUnits
+{
+    wdCharacter = 1, // 字母
+    wdWord = 2, // 单词
+    wdSentence = 3, // 句子
+    wdParagraph = 4, // 段落
+    wdLine = 5, // 行
+    wdStory = 6, // 所选区域
+    wdScreen = 7, // 当前屏幕
+    wdSection = 8, // 部分
+    wdColumn = 9, // 列
+    wdRow = 10, // 行
+    wdWindow = 11, // 窗口
+    wdCell = 12, // 单元格
+    wdCharacterFormatting = 13, // 字体格式
+    wdParagraphFormatting = 14, // 段落格式
+    wdTable = 15, // 表格
+    wdItem = 16 // 项目
+};
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -101,6 +132,12 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_KILLPAIR, m_killPair);
 	DDX_Control(pDX, IDC_GROUPC, m_groupChoose);
 	DDX_Control(pDX, IDC_HUNDRED, m_hundred);
+	DDX_Control(pDX, IDC_DECADE, m_decade);
+	DDX_Control(pDX, IDC_UNIT, m_unit);
+	DDX_Control(pDX, IDC_DShou, m_dshou);
+	DDX_Control(pDX, IDC_DECheck, m_deCheck);
+	DDX_Control(pDX, IDC_BIGSUM, m_bigSum);
+	DDX_Control(pDX, IDC_THREE, m_three);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -135,6 +172,12 @@ ON_LBN_SELCHANGE(IDC_LISTCODE, &CWelfareDlg::OnSelchangeListcode)
 //ON_BN_CLICKED(IDC_KILLPAIR, &CWelfareDlg::OnBnClickedKillpair)
 ON_BN_CLICKED(IDC_KILLODDEVEN, &CWelfareDlg::OnBnClickedKilloddeven)
 ON_BN_CLICKED(IDC_KILLBIGLITTLE, &CWelfareDlg::OnBnClickedKillbiglittle)
+ON_EN_CHANGE(IDC_DShou, &CWelfareDlg::OnEnChangeDshou)
+ON_EN_SETFOCUS(IDC_DShou, &CWelfareDlg::OnSetfocusDshou)
+ON_BN_CLICKED(IDC_DECheck, &CWelfareDlg::OnClickedDecheck)
+ON_BN_CLICKED(IDC_BIGSUM, &CWelfareDlg::OnClickedBigsum)
+ON_EN_CHANGE(IDC_THREE, &CWelfareDlg::OnEnChangeEdit1)
+ON_EN_SETFOCUS(IDC_THREE, &CWelfareDlg::OnSetfocusThree)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -175,6 +218,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	m_arr4.SetLimitText(10);
 	m_checkTip.SetCheck(1);
 	m_groupChoose.SetCheck(0);
+	m_deCheck.EnableWindow(false);
 	// test
 	//m_listCode.AddString(_T("234-9"),RGB(154,50,205));
 	//m_sift.SetCheck(TRUE);
@@ -200,6 +244,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	  TRACE0( "Failed   to   create   status   bar/n "); 
 	  return FALSE;             //   fail   to   create 
 	 } 
+
 	 m_StatusBar.SetPaneInfo(1,ID_SEPARATOR,SBPS_NORMAL,240); 
 	 m_StatusBar.ShowWindow(SW_SHOW); 
 	 CRect   rect; 
@@ -207,7 +252,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("·我要发· (2014.04.05)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.07.02)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -442,10 +487,13 @@ void CWelfareDlg::OnBnClickedForcast()
 			arr[3].clear();
 		}
 		// 组选
-		if(m_groupChoose.GetCheck())
-		{
-			ec->groupChoose();
-		}
+		//if( m_groupChoose.GetCheck())
+		//{
+		//	ec->groupChoose();
+		//}
+
+		ec->groupChoose();
+
 		// 和值尾有序化
 		ec->ordering();
 		
@@ -460,15 +508,16 @@ void CWelfareDlg::OnBnClickedForcast()
 		totalCodeCount = ec->dvCode.size();
 		CString stat;
 		// 组选
-		if(m_groupChoose.GetCheck())
+		if(true||m_groupChoose.GetCheck())
 		{
-			stat.Format(_T("组选：初步预测3D码数: %d个。"),ec->dvCode.size());
+			stat.Format(_T("组选：初步预测3D码数: %d注。"),ec->dvCode.size());
 			m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));
 		}else{
-			stat.Format(_T("直选：初步预测3D码数: %d个。"),ec->dvCode.size());
+			stat.Format(_T("直选：初步预测3D码数: %d注。"),ec->dvCode.size());
 			m_StatusBar.SetPaneText(0,_T("组码规则: 直选"));		
 		}		
 		m_REInfo.SetWindowTextW(stat);
+		m_deCheck.EnableWindow(true);
 	}else{
 		m_REInfo.SetWindowTextW(_T("输入数据不完整,请仔细检查!"));
 	}
@@ -484,19 +533,22 @@ void CWelfareDlg::OnBnClickedKillcode()
 		return;
 	}
 	vector<Gossip> gossip;
-	vector<int> arrkc[3];
-	CString csstr[3];
+	vector<int> arrkc[5];
+	CString csstr[5];
 	CString sgossip;
 
 	m_plusTail.GetWindowTextW(csstr[0]);
 	m_boldCode.GetWindowTextW(csstr[1]);
 	m_hundred.GetWindowTextW(csstr[2]);
+	m_decade.GetWindowTextW(csstr[3]);
+	m_unit.GetWindowTextW(csstr[4]);
 	m_twoCode.GetWindowTextW(sgossip);
 	int count = 0;
 	if(csstr[0].GetLength()||csstr[1].GetLength()
-		|| sgossip.GetLength()||csstr[2].GetLength())
+		|| sgossip.GetLength()||csstr[2].GetLength()||csstr[3].GetLength()
+		||csstr[4].GetLength())
 	{
-		for(int i=0; i<3; i++)
+		for(int i=0; i<5; i++)
 		{
 			int length = csstr[i].GetLength();
 			char *p = (LPSTR)(LPCTSTR)csstr[i];
@@ -528,32 +580,58 @@ void CWelfareDlg::OnBnClickedKillcode()
 				k += 2;
 			}
 		}
-		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],gossip);
+
+		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],arrkc[4],gossip);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
-	// 杀掉对子
-	/*
-	int pairNum = 0;
-	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
-	{
-		if(it->codeSeq[0]==it->codeSeq[1] || it->codeSeq[1] == it->codeSeq[2]
-		|| it->codeSeq[0]== it->codeSeq[2])
-		{
-			it = ec->dvCode.erase(it);
-			pairNum ++ ;
-			continue;
-		}
-		it++;
+	// 解析定三码
+	CString threeStr;
+	m_three.GetWindowTextW(threeStr);
+	// 待转换CString变量
+	wchar_t *ptrz;             
+	char buft[256];        // 目标存储空间
+	memset(buft,'\0',256);
+	int tclength = threeStr.GetLength()>255?255:threeStr.GetLength();
+	ptrz=threeStr.GetBuffer(tclength*sizeof(wchar_t));
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrz, -1, buft, sizeof(buft), NULL, NULL);
+	int  tcSelCount=0;
+	int tclen = strlen(buft);
+	// 定三选码
+	if(tclen > 0){
+		tcSelCount = ec->tcSelect(buft);
 	}
-	*/
+
+	// 解析钓叟码
+	CString dshouStr;
+	m_dshou.GetWindowTextW(dshouStr);
+	// 待转换CString变量
+	wchar_t *ptrx;             
+	char bufx[256];        // 目标存储空间
+	memset(bufx,'\0',256);
+	int dslength = dshouStr.GetLength()>255?255:dshouStr.GetLength();
+	ptrx=dshouStr.GetBuffer(dslength*sizeof(wchar_t));
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrx, -1, bufx, sizeof(bufx), NULL, NULL);
+	int  dsSelCount=0;
+	int selStrlen = strlen(bufx);
+	// 钓叟选码
+	if(selStrlen > 0){
+		
+		dsSelCount = ec->dsSelect(bufx);
+	}
+
+	// 杀大和
+	int bigCount = 0;
+	if(m_bigSum.GetCheck()){
+		bigCount = ec->killBig();
+	}
 
 	m_listCode.ResetContent();
 	int siftCount = 0;
 	int oeCount = 0;
 	int blCount = 0;
 	int flag = m_sift.GetCheck();
-	
+	int pairCount = 0;
 	// 
 	for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); )
 	{
@@ -582,8 +660,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 		// 杀全大全小
 		if(m_killABL.GetCheck())
 		{
-			if((it->codeSeq[0]>5 && it->codeSeq[1]>5 && it->codeSeq[2] >5) || 
-				(it->codeSeq[0]<5 && it->codeSeq[1]<5 && it->codeSeq[2]<5))
+			if(isExtreme(it))
 			{
 				blCount++;
 				it = ec->dvCode.erase(it);
@@ -591,20 +668,24 @@ void CWelfareDlg::OnBnClickedKillcode()
 			}
 		}
 
+		if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1] == it->codeSeq[2]
+		|| it->codeSeq[0] == it->codeSeq[2])
+		{
+			pairCount ++;
+		}
 		CString tmp;
 		tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
 		m_listCode.AddString(tmp);
 		it++;
 	}
 
-	
 	CString ts;
-	if((siftCount|oeCount|blCount) != 0)
+	if((siftCount|oeCount|blCount|dsSelCount|bigCount|tcSelCount) != 0)
 	{
-		int delTotal = count+siftCount+oeCount+blCount;
-		ts.Format(_T("杀码 %d 个(杀两头: %d 个, 全大全小： %d，全奇全偶: %d个,\n其他:%d 个)，选出 %d 个."),delTotal,siftCount,blCount,oeCount,count, ec->dvCode.size());
+		int delTotal = count+siftCount+oeCount+blCount+dsSelCount+bigCount+tcSelCount;
+		ts.Format(_T("杀码 %d 注(杀两头: %d 注, 全大全小： %d，全奇全偶: %d注,大和: %d注,\n钓叟：%d注，三码: %d 注,其他:%d 注)，选出 %d 注."),delTotal,siftCount,blCount,oeCount,bigCount,dsSelCount,tcSelCount,count, ec->dvCode.size());
 	}else
-		ts.Format(_T("杀码 %d 个，选出 %d 个."),count,ec->dvCode.size());
+		ts.Format(_T("杀码 %d 注，余 %d 注(其中对子 %d 注,非对子 %d 注)."),count,ec->dvCode.size(),pairCount,ec->dvCode.size()-pairCount);
 	m_REInfo.SetWindowTextW(ts);
 }
 
@@ -621,9 +702,17 @@ BOOL IsPair(CString code)
 	return false;
 }
 
+BOOL IsPair(vector<CodeType>::iterator it){
+	if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1]==it->codeSeq[2]
+	||it->codeSeq[0] == it->codeSeq[2]){
+		return true;
+	}
+	return false;
+}
+
+
 void CWelfareDlg::OnBnClickedExport()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	int count = m_listCode.GetCount();
 
 	oddCodeCount = count;
@@ -633,98 +722,169 @@ void CWelfareDlg::OnBnClickedExport()
 		m_REInfo.SetWindowTextW(_T("未预测或列表编码为空"));
 		return;
 	}
+
+	m_REInfo.SetWindowTextW(_T("预测报表正在生成中,请稍后..."));
+
 	//过滤器
-	TCHAR szFilter[] = _T("Word文件(*.doc)|*.doc|文本文件(*.txt)|*.txt|所有文件(*.*)|*.*||");
-	
-	TCHAR *filename = NULL;
+	//TCHAR szFilter[] = _T("Word文件(*.doc)|*.doc|文本文件(*.txt)|*.txt|所有文件(*.*)|*.*||");
+	//TCHAR szFilter[] = _T("Word文件(*.doc)|*.doc||");
+	//
+	//TCHAR *filename = NULL;
 	CString cf;
 	m_issue.GetWindowTextW(cf);
 	int issue = 888;
 	if(cf.GetLength())
 	{
 		issue = _ttoi(cf);
-		cf += _T("期3D码预测");
-		filename = cf.GetBuffer(cf.GetLength());
+		//cf += _T("期3D码预测");
+		//filename = cf.GetBuffer(cf.GetLength());
 	}
 
-	CFileDialog f_Export(FALSE,
-		_T("doc"),
-		filename,
-		OFN_OVERWRITEPROMPT |OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_CREATEPROMPT,
-		szFilter,
-		this);	
-	CString fpath;
-	//char Buf[255];
-	//WCHAR *pChar;
-	if(f_Export.DoModal() == IDOK)
-	{
-		fpath = f_Export.GetPathName();
-	}else{
-		MessageBox(_T("请输入导出文件名"),_T("导出"),MB_OK);
-		return;
-	}
-	CFile fout(fpath,CFile::modeCreate | CFile::modeReadWrite);
-	fout.Write("\xff\xfe",2);
-
-	CString str;
-	str.Format(_T("\t\t\t\t\t第 %d 期 福彩3D码预测打印报表\n\t\t共计 %d 个3D码,报表由 我要发 导出！！\n\n\n"),issue,totalCodeCount);
-	fout.Write(str,sizeof(TCHAR)*str.GetLength());
 	vector<CString> pairCode;
-	for(int i=0; i<count; ++i)
-	{
+	vector<CString> nonpairCode;
+
+	CString spacestr = _T("      ");
+	CString separator = _T("\n-------------------------------");
+
+	// 统计分类
+	//for(int i=0; i<count; ++i)
+	//{
+	//	CString tmp;
+	//	m_listCode.GetText(i,tmp);
+
+	//	
+	//	if(IsPair(tmp))
+	//	{
+	//		pairCode.push_back(tmp);
+	//		//continue;
+	//	}else{
+	//		nonpairCode.push_back(tmp);
+	//	}
+	//}
+
+	// 根据 ec->dvCode 组码
+	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it!=ec->dvCode.end(); it++){
 		CString tmp;
-		m_listCode.GetText(i,tmp);
-
-		/*
-		if(IsPair(tmp))
-		{
+		//if(m_deCheck.GetCheck()){
+		//	if(IsPair(it)){
+		//		genThree(it,pairCode);
+		//	}else{
+		//		genSix(it,nonpairCode);
+		//	}
+		//}else{
+		//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		//	if(IsPair(it)){
+		//		pairCode.push_back(tmp);
+		//	}else{
+		//		nonpairCode.push_back(tmp);
+		//	}
+		//}
+		tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		if(IsPair(it)){
 			pairCode.push_back(tmp);
-			continue;
+		}else{
+			nonpairCode.push_back(tmp);
 		}
-		wchar_t *ptr;
-		char buf[16];
-		ptr = tmp.GetBuffer(tmp.GetLength());
-		WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)ptr, -1, buf, sizeof(buf), NULL, NULL); 
-		fout.Write(buf,strlen(buf));
-		fout.Write("      ",strlen("      "));
-		*/
-		CString spacestr = _T("      ");
-		fout.Write(tmp,sizeof(TCHAR)*tmp.GetLength());
-		fout.Write(spacestr,sizeof(TCHAR)*spacestr.GetLength());
 	}
-	/*
-	memset(str,0,sizeof(str));
-	sprintf(str,"( 非对子: %d 个 )",count - pairCode.size());
-	fout.Write(str,strlen(str));
 
-	// 打印对子
-	fout.Write("\n----------------------------\n",strlen("\n----------------------------\n"));
+	// 定义word操作变量
+	COleVariant  vTrue((short)TRUE),  
+                  vFalse((short)FALSE),  
+                  vopt((long)DISP_E_PARAMNOTFOUND,  VT_ERROR); 	
+	CApplication oWordApp ; 
+	CSelection oSel ;  
+	CDocuments oDocs ; 
+	CMyDocument oDoc ; 
+	CParagraphs paragraphs;
+
+	//WdUnits fv;
+
+	if (!oWordApp.CreateDispatch(_T("Word.Application")) ){ 
+		AfxMessageBox( _T( "word初始化失败！" ) , MB_OK & MB_SETFOREGROUND);  
+		return;  // 返回，否则程序崩溃 
+	}
+	// 先不显示
+	oWordApp.put_Visible(false);
+
+	oDocs = oWordApp.get_Documents(); 
+	oDoc = oDocs.Add(vopt,vopt,vopt,vopt);
+	oSel = oWordApp.get_Selection();
+	oSel.WholeStory();
+	
+	CParagraphFormat cformat = oSel.get_ParagraphFormat();
+	cformat.put_Alignment(0);
+
+	CString codetype;
+	if(ec->getCodeType() == DIRECT){
+		codetype.Format(_T("直选"));
+	}else{
+		codetype.Format(_T("组选"));
+	}
+
+	CMyFont font = oSel.get_Font();
+	CString str;
+	str.Format(_T("\t\t第 %d 期 福彩3D码预测（%s）打印报表\n"),issue,codetype);	
+	font.put_Name(_T("黑体"));
+	font.put_Size(18);
+	oSel.TypeText(str);
+	str.Format(_T("\t\t\t\t共计 %d 注3D码,本报表由 我要发·518 导出！！\n"),count);
+	font.put_Name(_T("宋体"));
+	font.put_Size(12);
+	oSel.TypeText(str);
+	oSel.TypeParagraph();
+	font.put_Size(14);
+
+	font.put_Size( 12 );
+	str.Format(_T("※ 对子: %d 注 "),pairCode.size());
+	oSel.TypeText(str);
+	oSel.TypeText(separator);
+	font.put_Size( 14 );
+	oSel.TypeParagraph();
+
+
+	// 导出对子
 	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
 	{
-		wchar_t *ptr;
-		char buf[16];
-		ptr = (*it).GetBuffer((*it).GetLength());
-		WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)ptr, -1, buf, sizeof(buf), NULL, NULL); 
-		fout.Write(buf,strlen(buf));
-		fout.Write("      ",strlen("      "));
+		CString tmp = *it;
+		oSel.TypeText(tmp);
+		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
+		font.put_Size( 10 );
+		oSel.MoveRight(COleVariant((short)2),COleVariant((short)1),COleVariant((short)0));
+		font.put_Size( 14 );
+		oSel.TypeText(spacestr);
 	}
-	memset(str,0,sizeof(str));
-	sprintf(str,"( 对子: %d 个 )", pairCode.size());
-	fout.Write(str,strlen(str));
+	font.put_Size( 12 );
+	str.Format(_T(" \n\n※ 非对子: %d 注 "),nonpairCode.size());
+	oSel.TypeText(str);
+	oSel.TypeText(separator);
+	font.put_Size( 14 );
+	oSel.TypeParagraph();
 
+	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++)
+	{
+		CString tmp = *it;
+		oSel.TypeText(tmp);
+		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
+		font.put_Size( 10 );
+		oSel.MoveRight(COleVariant((short)2),COleVariant((short)1),COleVariant((short)0));
+		font.put_Size( 14 );
+		oSel.TypeText(spacestr);
+	}
 	pairCode.clear();
-	*/
-	fout.Close();
+	nonpairCode.clear();
+
 	CString stat;
-	stat.Format(_T("文件已经导出,3D码:%d 个，位置:"),count);
-	stat += fpath;
+	stat.Format(_T("预测已经导出,3D码:%d 注"),count);
 	m_REInfo.SetWindowTextW(stat);
+
+	// 显示报表
+	oWordApp.put_Visible(true);
+	
 }
 
 
 void CWelfareDlg::OnBnClickedReset()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	ec->eraseCode();
 	m_listCode.ResetContent();
 	while(!recoverCodeStack.empty())
@@ -744,7 +904,16 @@ void CWelfareDlg::OnBnClickedReset()
 	m_twoCode.SetWindowTextW(_T(""));
 	m_REInfo.SetWindowTextW(_T(""));
 	m_hundred.SetWindowTextW(_T(""));
+	m_decade.SetWindowTextW(_T(""));
+	m_unit.SetWindowTextW(_T(""));
 	m_groupChoose.EnableWindow(true);
+	m_dshou.SetWindowTextW(_T(""));
+	m_deCheck.EnableWindow(false);
+	m_deCheck.SetCheck(false);
+	m_bigSum.SetCheck(false);
+	m_killABL.SetCheck(false);
+	m_killAOE.SetCheck(false);
+	m_sift.SetCheck(false);
 	m_StatusBar.SetPaneText(0,_T("欢迎使用！"));
 	forcastFlag = FALSE;
 }
@@ -870,7 +1039,7 @@ void CWelfareDlg::OnClickedSift()
 			it++;
 		}
 		CString info;
-		info.Format(_T("筛选删除 %d 个3D码，余%d 个3D码，共 %d 个3D码!!"),delCount,m_listCode.GetCount(),m_listCode.GetCount()+delCount);
+		info.Format(_T("筛选删除 %d 注3D码，余%d 注3D码，共 %d 注3D码!!"),delCount,m_listCode.GetCount(),m_listCode.GetCount()+delCount);
 		m_REInfo.SetWindowTextW(info);
 	}
 }
@@ -963,12 +1132,28 @@ void CWelfareDlg::OnBnClickedKilloddeven()
 			it++;
 		}
 		CString info;
-		info.Format(_T("筛选删除 %d 个3D码，余%d 个3D码，共 %d 个3D码!!"),delCount,m_listCode.GetCount(),m_listCode.GetCount()+delCount);
+		info.Format(_T("筛选删除 %d 注3D码，余%d 注3D码，共 %d 注3D码!!"),delCount,m_listCode.GetCount(),m_listCode.GetCount()+delCount);
 		m_REInfo.SetWindowTextW(info);
 	}
 
 }
-
+// 判定全大全小
+BOOL isExtreme(const vector<CodeType>::iterator it){
+	int high = 0;
+	int low = 0;
+	for(int i=0; i<3; i++){
+		if(it->codeSeq[i] == 0 || it->codeSeq[i]>5){
+			high++;
+		}else{
+			low++;
+		}
+	}
+	if(high == 3 || low == 3){
+		return true;
+	}else{
+		return false;
+	}
+}
 
 void CWelfareDlg::OnBnClickedKillbiglittle()
 {
@@ -984,8 +1169,9 @@ void CWelfareDlg::OnBnClickedKillbiglittle()
 		m_listCode.ResetContent();
 		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
 		{
-			if((it->codeSeq[0]>5 && it->codeSeq[1]>5 && it->codeSeq[2]>5) || 
-				(it->codeSeq[0]<5 && it->codeSeq[1]<5 && it->codeSeq[2]<5))
+			//if((it->codeSeq[0]>5 && it->codeSeq[1]>5 && it->codeSeq[2]>5) || 
+			//	(it->codeSeq[0]<5 && it->codeSeq[1]<5 && it->codeSeq[2]<5))
+			if(isExtreme(it))
 			{
 				delCount++;
 				it = ec->dvCode.erase(it);
@@ -997,7 +1183,7 @@ void CWelfareDlg::OnBnClickedKillbiglittle()
 			it++;
 		}
 		CString info;
-		info.Format(_T("筛选删除 %d 个3D码，余%d 个3D码，共 %d 个3D码!!"),delCount,m_listCode.GetCount(),m_listCode.GetCount()+delCount);
+		info.Format(_T("筛选删除 %d 注3D码，余%d 注3D码，共 %d 注3D码!!"),delCount,m_listCode.GetCount(),m_listCode.GetCount()+delCount);
 		m_REInfo.SetWindowTextW(info);
 	}
 }
@@ -1039,4 +1225,91 @@ CString CWelfareDlgGetFileVer()
  }
  */
  return _T("");
+}
+
+void CWelfareDlg::OnEnChangeDshou()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CWelfareDlg::OnSetfocusDshou()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_REInfo.SetWindowTextW(_T("可输入任意组钓叟码，中间用#、/、*等字符隔开，例如：\n\t168#2518#56789\n\t123456 32457 45678"));
+}
+
+// 转换为直选
+void CWelfareDlg::OnClickedDecheck()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if(forcastFlag && m_deCheck.GetCheck()){
+		ec->grouptodirect();
+
+		m_listCode.ResetContent();
+		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
+		{
+			CString tmp;
+			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+			m_listCode.AddString(tmp);
+			it++;
+		}
+
+		CString info;
+		info.Format(_T("已转换为直选，共 %d 注3D码!!"),ec->dvCode.size());
+		m_StatusBar.SetPaneText(0,_T("组码规则: 直选"));
+		m_REInfo.SetWindowTextW(info);
+	}
+}
+
+// 杀大和
+void CWelfareDlg::OnClickedBigsum()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if(forcastFlag && m_bigSum.GetCheck()){
+
+		if(IDOK != MessageBox(_T("选择是，将杀掉和尾值大于20的3D码？"),_T("杀大和提示"),MB_OKCANCEL))
+		{
+			m_bigSum.SetCheck(FALSE);
+			return;
+		}
+
+		int count = 0;
+		count = ec->killBig(20);
+
+		m_listCode.ResetContent();
+		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )
+		{
+			CString tmp;
+			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+			m_listCode.AddString(tmp);
+			it++;
+		}
+
+		CString info;
+		info.Format(_T("大和杀码 %d 注，共 %d 注3D码!!"),count,ec->dvCode.size());
+		m_REInfo.SetWindowTextW(info);
+	}
+}
+
+
+void CWelfareDlg::OnEnChangeEdit1()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+void CWelfareDlg::OnSetfocusThree()
+{
+	m_REInfo.SetWindowTextW(_T("可输入任意组定三码，中间用#、/、*等字符隔开，例如：\n\t168#2518#56789\n\t123456 32457 45678"));
 }

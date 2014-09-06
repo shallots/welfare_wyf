@@ -3,6 +3,9 @@
 #include <vector>
 #include <algorithm>
 
+#define GROUP	0
+#define DIRECT	1
+
 using std::vector;
 
 typedef struct
@@ -16,10 +19,12 @@ typedef struct
 	int x;
 	int y;
 }Gossip;
+
 class Encode
 {
 private:
 	bool codeFlag;				// 编码序列标志
+	int codetype;
 public:
 	vector<CodeType> dvCode;
 	vector<CodeType> backup;
@@ -35,13 +40,29 @@ public:
 	int de_weight();
 	// 组选函数
 	int groupChoose();
+	// 组选转直选
+	int grouptodirect();
 	// 编码排序,返回编码个数
 	int ordering();
 	// 杀码，返回杀码个数
-	int killCode(vector<int>,vector<int>,vector<int>,vector<Gossip>);
+	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
 	// 筛选和值
 	int siftPlus(int min, int max);
 
+	// 定三码
+	int tcSelect(char *tcSelect);
+
+	// 钓叟选码
+	int dsSelect(char *dsSequence);
+
+	
+	// 杀大和
+	int killBig(int big=20);
+
+	// 获得组码类型
+	int getCodeType();
+	// 设置组码类型
+	int setCodeType(int ct);
 	// 销毁编码
 	void eraseCode();
 	// 打印

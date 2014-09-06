@@ -118,5 +118,18 @@ public:
 	afx_msg void OnBnClickedKillbiglittle();
 	CButton m_groupChoose;
 	CEdit m_hundred;
+	CEdit m_decade;
+	CEdit m_unit;
+	CEdit m_dshou;
+	CButton m_deCheck;
+	afx_msg void OnEnChangeDshou();
+	afx_msg void OnSetfocusDshou();
+	afx_msg void OnClickedDecheck();
+	CButton m_bigSum;
+	afx_msg void OnClickedBigsum();
+	afx_msg void OnEnChangeEdit1();
+	CEdit m_three;
+	afx_msg void OnSetfocusThree();
 };
 int isInSift(CString code);
+BOOL isExtreme(const vector<CodeType>::iterator it);
