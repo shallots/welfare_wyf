@@ -7,6 +7,7 @@
 #include "CListBox.h"
 #include <stack>
 #include "afxwin.h"
+#include "afxcmn.h"
 
 using std::stack;
 class CWelfareDlgAutoProxy;
@@ -40,6 +41,8 @@ private:
 	CString GetFileVer();
 public:
 	Encode *ec;
+	vector<Encode*> ecVector;
+
 	BOOL forcastFlag; // ‘§≤‚±Í÷æ
 	CWinThread *pThread;
 	HANDLE CreateThreadEvent;
@@ -130,6 +133,14 @@ public:
 	afx_msg void OnEnChangeEdit1();
 	CEdit m_three;
 	afx_msg void OnSetfocusThree();
+	CEdit m_issueTitle;
+	CListCtrl mListc;
+	CButton mAddQueue;
+	afx_msg void OnBnClickedAddqueue();
+	afx_msg void OnClickForcastqueue(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDblclkForcastqueue(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedClearall();
+	afx_msg void OnBnClickedCompositeselect();
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);

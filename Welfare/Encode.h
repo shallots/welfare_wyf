@@ -12,6 +12,7 @@ typedef struct
 {
 	int codeSeq[3];
 	unsigned int mantissa;
+	int frequency;
 }CodeType;
 
 typedef struct
@@ -23,7 +24,9 @@ typedef struct
 class Encode
 {
 private:
-	bool codeFlag;				// 编码序列标志
+	bool codeFlag;				// 是否编码序列标志
+	bool isInQueue;				// 是否被添加到队列
+	bool isMerge;
 	int codetype;
 public:
 	vector<CodeType> dvCode;
@@ -44,6 +47,9 @@ public:
 	int grouptodirect();
 	// 编码排序,返回编码个数
 	int ordering();
+
+	// 按频度排序
+	int orderByFreq();
 	// 杀码，返回杀码个数
 	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
 	// 筛选和值
@@ -63,6 +69,15 @@ public:
 	int getCodeType();
 	// 设置组码类型
 	int setCodeType(int ct);
+
+	bool getIsMerge();
+	void setIsMerge(bool isMerge);
+
+	// 归并多组编码
+	int merge(Encode *ec);
+
+	void setInQueue(bool isInQueue);
+	bool getIsInQueue();
 	// 销毁编码
 	void eraseCode();
 	// 打印

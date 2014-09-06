@@ -5,6 +5,8 @@ Encode::Encode()
 {
 	codeFlag = false;
 	codetype = GROUP;
+	isInQueue = false;
+	isMerge = false;
 }
 
 Encode::~Encode()
@@ -55,6 +57,7 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 						tmp.codeSeq[2] = j;
 						int codeSum = (*ita + j + *itc);
 						tmp.mantissa = codeSum % 10;
+						tmp.frequency = 1;
 						dvCode.push_back(tmp);
 					}
 				}
@@ -187,6 +190,7 @@ inline int getMin(const vector<CodeType>::iterator va)
 	mina = mina>va->codeSeq[2]?va->codeSeq[2]:mina;
 	return mina;
 }
+
 /***********************************************
 *	名称：去重函数
 *	功能：直选辅助函数去重
@@ -272,11 +276,27 @@ bool comp2(const CodeType &a, const CodeType &b)
 		return a.codeSeq[0] < b.codeSeq[0];
 }
 
+bool compWithFreq(const CodeType &a, const CodeType &b){
+	if(a.frequency == b.frequency){
+		return comp(a,b);
+	}else{
+		return a.frequency > b.frequency;
+	}
+	return true;
+}
+
 int Encode::ordering()
 {
 	if(!codeFlag)
 		return 0;
 	sort(dvCode.begin(),dvCode.end(),comp);
+	return 1;
+}
+
+int Encode::orderByFreq(){
+	if(!codeFlag)
+		return 0;
+	sort(dvCode.begin(),dvCode.end(),compWithFreq);
 	return 1;
 }
 
@@ -649,7 +669,67 @@ void Encode::eraseCode()
 	codetype = GROUP;
 }
 
+// 比较预测码是否相等
+bool codeEqual(const vector<CodeType>::iterator a,const vector<CodeType>::iterator b, int flag){
+	if(flag == DIRECT){
+		return a->codeSeq[0] == b->codeSeq[0] && 
+				a->codeSeq[1] == b->codeSeq[1] && a->codeSeq[2] == b->codeSeq[2];
+	}else{
+		return a->mantissa == b->mantissa &&
+				getMax(a) == getMax(b) && getMin(a) == getMin(b);
+	}
+}
 
+// 归并其他Encode对象，计算dvCode频度
+int Encode::merge(Encode *ec){
+	if(this->dvCode.size() == 0){ // 直接copy数据
+		copydvCode(ec->dvCode, dvCode);
+		codetype = ec->codetype;
+		codeFlag = codeFlag;
+		setIsMerge(true);
+		return dvCode.size();
+	}
+	if(codetype != ec->codetype)
+		return -1;
+	int size = dvCode.size();
+	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); it++){
+		int pushFlag = true;
+		int i = 0;
+		for(vector<CodeType>::iterator ita = dvCode.begin(); ita != dvCode.end() && i<size; ita++){
+			if(codeEqual(it,ita,codetype)){
+				ita->frequency += 1;
+				pushFlag = false;
+				break;
+			}
+			i++;
+		}
+		if(pushFlag)
+			dvCode.push_back(*it);
+	}
+	// 按频度排序
+	orderByFreq();
+	// 设置标志
+	setIsMerge(true);
+	codeFlag = true;
+	return dvCode.size();
+}
+
+
+bool Encode::getIsInQueue(){
+	return isInQueue;
+}
+
+void Encode::setInQueue(bool isInQueue){
+	this->isInQueue = isInQueue;
+}
+
+bool Encode::getIsMerge(){
+	return isMerge;
+}
+
+void Encode::setIsMerge(bool isMerge){
+	this->isMerge = isMerge;
+}
 void Encode::printCode()
 {
 	if(!codeFlag)

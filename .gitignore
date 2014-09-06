@@ -31,3 +31,6 @@
 *.sdf
 *.ipch
 *.opensdf
+
+# dir
+Release
