@@ -138,9 +138,10 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DECheck, m_deCheck);
 	DDX_Control(pDX, IDC_BIGSUM, m_bigSum);
 	DDX_Control(pDX, IDC_THREE, m_three);
-	DDX_Control(pDX, IDC_ISSUETTITLE, m_issueTitle);
+	//  DDX_Control(pDX, IDC_ISSUETTITLE, m_issueTitle);
 	DDX_Control(pDX, IDC_LIST1, mListc);
 	DDX_Control(pDX, IDC_ADDQUEUE, mAddQueue);
+	DDX_Control(pDX, IDC_RADIO1, mGenType);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -248,6 +249,8 @@ BOOL CWelfareDlg::OnInitDialog()
 	killCodeCount = 0;
 	oddCodeCount = 0;
 
+	queueNum = 0;
+
 	// 初始化状态栏
 	static UINT indicators[2] = 
 	 { 
@@ -267,7 +270,9 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.09.06)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.01)"));
+	 
+	 mGenType.SetCheck(true);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -430,6 +435,7 @@ void CWelfareDlg::OnBnClickedForcast()
 		m_listCode.ResetContent();
 		forcastFlag = FALSE;
 	}
+
 	CString csarr[4];
 	int arrCount = 0;
 	int nullArrIndex = -1;
@@ -491,7 +497,7 @@ void CWelfareDlg::OnBnClickedForcast()
 					continue;
 				indexFlag[j++] = i;
 			}
-			if(ec->encoding(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]]))
+			if(ec->encoding(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]],mGenType.GetCheck()))
 			{
 				forcastFlag = TRUE;
 				arr[0].clear();
@@ -500,7 +506,7 @@ void CWelfareDlg::OnBnClickedForcast()
 			}
 			else
 				return;
-		}else if (arrCount == 4 && ec->encoding(arr[0],arr[1],arr[2],arr[3])){
+		}else if (arrCount == 4 && ec->encoding(arr[0],arr[1],arr[2],arr[3],mGenType.GetCheck())){
 
 			forcastFlag = TRUE;
 			arr[0].clear();
@@ -518,7 +524,7 @@ void CWelfareDlg::OnBnClickedForcast()
 
 		// 和值尾有序化
 		ec->ordering();
-		
+
 		// 输出到右边列表中
 		for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); it++)
 		{
@@ -890,8 +896,8 @@ void CWelfareDlg::OnBnClickedReset()
 	totalCodeCount = 0;
 	killCodeCount = 0;
 	oddCodeCount = 0;
+	queueNum = 0;
 	m_issue.SetWindowTextW(_T(""));
-	m_issueTitle.SetWindowTextW(_T(""));
 	m_arr1.SetWindowTextW(_T(""));
 	m_arr2.SetWindowTextW(_T(""));
 	m_arr3.SetWindowTextW(_T(""));
@@ -1319,8 +1325,9 @@ void CWelfareDlg::OnBnClickedAddqueue()
 		return;
 	ecVector.push_back(ec);
 	ec->setInQueue(true);
+	queueNum ++;
 	CString listItemStr;
-	m_issueTitle.GetWindowTextW(listItemStr);
+	listItemStr.Format(_T("第 %d 组"),queueNum);
 	mListc.InsertItem(mListc.GetItemCount(),listItemStr);
 }
 

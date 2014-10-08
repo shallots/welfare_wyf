@@ -23,7 +23,7 @@ Encode::~Encode()
 *	日期:14/06/04
 *	说明:新版要求组选杀码，最后可导出直选，编码预测码时先生成二码
 *********************************************************/
-int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
+int Encode::encodingTwo(vector<int> da, vector<int> db, vector<int> dc)
 {
 	//  暂未写异常处理
 	if(codeFlag)
@@ -80,8 +80,8 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 *	日期:13/05/13
 *   注释: 新版本，先生成两码再生成3码，故此函数废弃
 *********************************************************/
-/*
-int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
+
+int Encode::encodingThree(vector<int> da, vector<int> db, vector<int> dc)
 {
 	//  暂未写异常处理
 	if(codeFlag)
@@ -123,6 +123,7 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 							tmp.codeSeq[2] = *itc;
 							int codeSum = (*ita + *itb + *itc);
 							tmp.mantissa = codeSum % 10;
+							tmp.frequency = 1;
 							dvCode.push_back(tmp);
 						}
 					}
@@ -131,12 +132,18 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 		}
 	}
 	de_weight();
-	//groupChoose();
+	if(codetype == GROUP)
+		groupChoose();
 	codeFlag = true;
 	return dvCode.size();
 }
-*/
 
+int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, bool type){
+	if(type)
+		return encodingTwo(da, db, dc);
+	else
+		return encodingThree(da, db, dc);
+}
 /*********************************************************
 *	名称：四向量编码函数
 *	功能：使用四组整数序列进行编码
@@ -146,7 +153,7 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc)
 *	作者:Hyw
 *	日期:13/06/02
 *********************************************************/
-int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, vector<int> dd)
+int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, vector<int> dd, bool type)
 {
 	// 未写异常处理
 	if(codeFlag)
@@ -170,7 +177,7 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, vector<int>
 		int n = (i + 2) % 4;
 
 		codeFlag = FALSE;
-		encoding(*vec[i],*vec[m],*vec[n]);
+		encoding(*vec[i],*vec[m],*vec[n],type);
 	}
 	return dvCode.size();
 }
@@ -592,6 +599,7 @@ void genThree(vector<CodeType>::iterator it,vector<CodeType>& list){
 		tc.codeSeq[(i+1)%3] = code[0];
 		tc.codeSeq[(i+2)%3] = code[0];
 		tc.mantissa = it->mantissa;
+		tc.frequency = it->frequency;
 		list.push_back(tc);
 	}
 }
@@ -609,6 +617,7 @@ void genSix(vector<CodeType>::iterator it,vector<CodeType>& list){
 				ct.codeSeq[1] = it->codeSeq[j];
 				ct.codeSeq[2] = it->codeSeq[k];
 				ct.mantissa = it->mantissa;
+				ct.frequency = it->frequency;
 				list.push_back(ct);
 			}
 		}
@@ -685,7 +694,7 @@ int Encode::merge(Encode *ec){
 	if(this->dvCode.size() == 0){ // 直接copy数据
 		copydvCode(ec->dvCode, dvCode);
 		codetype = ec->codetype;
-		codeFlag = codeFlag;
+		codeFlag = ec->codeFlag;
 		setIsMerge(true);
 		return dvCode.size();
 	}
@@ -697,7 +706,7 @@ int Encode::merge(Encode *ec){
 		int i = 0;
 		for(vector<CodeType>::iterator ita = dvCode.begin(); ita != dvCode.end() && i<size; ita++){
 			if(codeEqual(it,ita,codetype)){
-				ita->frequency += 1;
+				ita->frequency += it->frequency;
 				pushFlag = false;
 				break;
 			}

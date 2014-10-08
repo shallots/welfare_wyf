@@ -51,6 +51,8 @@ public:
 	int killCodeCount;	// 杀码数
 	int oddCodeCount;	// 余码数
 
+	int queueNum;
+
 	CStatusBar m_StatusBar; // 状态栏
 	stack<RECOVER> recoverCodeStack;
 // 实现
@@ -133,7 +135,7 @@ public:
 	afx_msg void OnEnChangeEdit1();
 	CEdit m_three;
 	afx_msg void OnSetfocusThree();
-	CEdit m_issueTitle;
+//	CEdit m_issueTitle;
 	CListCtrl mListc;
 	CButton mAddQueue;
 	afx_msg void OnBnClickedAddqueue();
@@ -141,6 +143,7 @@ public:
 	afx_msg void OnDblclkForcastqueue(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedClearall();
 	afx_msg void OnBnClickedCompositeselect();
+	CButton mGenType;
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);
