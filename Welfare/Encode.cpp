@@ -300,6 +300,13 @@ int Encode::ordering()
 	return 1;
 }
 
+int Encode::orderForRecycleBin(){
+	if(!codeFlag)
+		return 0;
+	sort(recycleBin.begin(),recycleBin.end(),comp);
+	return 1;
+}
+
 int Encode::orderByFreq(){
 	if(!codeFlag)
 		return 0;
@@ -307,6 +314,12 @@ int Encode::orderByFreq(){
 	return 1;
 }
 
+/***********************************************
+*	名称：基础杀码函数
+*	功能：和值尾，胆码，百，十，个，二码等
+*	作者：Hyw
+*	日期：13/05/13
+************************************************/
 int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
 {
 	if(!codeFlag)
@@ -322,7 +335,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	sort(decade.begin(),decade.end());
 	sort(unit.begin(),unit.end());
 
-	//  和尾值杀码,算法有待优化
+	//  杀码,算法有待优化
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
 	{
 		bool flag = false;
@@ -648,6 +661,8 @@ int Encode::killBig(int big){
 	int count = 0;
 	for(vector<CodeType>::iterator it=dvCode.begin(); it!=dvCode.end();){
 		if((it->codeSeq[0] + it->codeSeq[1] + it->codeSeq[2])>20){
+			if(getIsMerge())
+				recycleBin.push_back(*it);
 			it = dvCode.erase(it);
 			count++;
 		}
@@ -674,6 +689,8 @@ void Encode::eraseCode()
 	if(!codeFlag)
 		return;
 	dvCode.clear();
+	backup.clear();
+	recycleBin.clear();
 	codeFlag = false;
 	codetype = GROUP;
 }

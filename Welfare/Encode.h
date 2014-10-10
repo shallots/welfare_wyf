@@ -31,6 +31,10 @@ private:
 public:
 	vector<CodeType> dvCode;
 	vector<CodeType> backup;
+	// 杀大和，杀两头，全大全小，全奇全偶
+	vector<CodeType> recycleBin;
+
+	// 杀码队列
 
 	Encode();
 	~Encode();
@@ -49,9 +53,10 @@ public:
 	int grouptodirect();
 	// 编码排序,返回编码个数
 	int ordering();
-
+	int orderForRecycleBin();
 	// 按频度排序
 	int orderByFreq();
+
 	// 杀码，返回杀码个数
 	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
 	// 筛选和值
@@ -62,8 +67,6 @@ public:
 
 	// 钓叟选码
 	int dsSelect(char *dsSequence);
-
-	
 	// 杀大和
 	int killBig(int big=20);
 
@@ -80,6 +83,7 @@ public:
 
 	void setInQueue(bool isInQueue);
 	bool getIsInQueue();
+
 	// 销毁编码
 	void eraseCode();
 	// 打印

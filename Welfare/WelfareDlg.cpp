@@ -130,7 +130,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_KILLBIGLITTLE, m_killABL);
 	DDX_Control(pDX, IDC_KILLODDEVEN, m_killAOE);
 	//  DDX_Control(pDX, IDC_KILLPAIR, m_killPair);
-	DDX_Control(pDX, IDC_GROUPC, m_groupChoose);
+	//  DDX_Control(pDX, IDC_GROUPC, m_groupChoose);
 	DDX_Control(pDX, IDC_HUNDRED, m_hundred);
 	DDX_Control(pDX, IDC_DECADE, m_decade);
 	DDX_Control(pDX, IDC_UNIT, m_unit);
@@ -142,6 +142,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, mListc);
 	DDX_Control(pDX, IDC_ADDQUEUE, mAddQueue);
 	DDX_Control(pDX, IDC_RADIO1, mGenType);
+	DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -226,7 +227,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	m_arr3.SetLimitText(10);
 	m_arr4.SetLimitText(10);
 	m_checkTip.SetCheck(1);
-	m_groupChoose.SetCheck(0);
+	outputCheck.SetCheck(1);
 	m_deCheck.EnableWindow(false);
 	// test
 	//m_listCode.AddString(_T("234-9"),RGB(154,50,205));
@@ -270,7 +271,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.01)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.10)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -503,8 +504,7 @@ void CWelfareDlg::OnBnClickedForcast()
 				arr[0].clear();
 				arr[1].clear();
 				arr[2].clear();
-			}
-			else
+			}else
 				return;
 		}else if (arrCount == 4 && ec->encoding(arr[0],arr[1],arr[2],arr[3],mGenType.GetCheck())){
 
@@ -514,11 +514,6 @@ void CWelfareDlg::OnBnClickedForcast()
 			arr[2].clear();
 			arr[3].clear();
 		}
-		// 组选
-		//if( m_groupChoose.GetCheck())
-		//{
-		//	ec->groupChoose();
-		//}
 
 		ec->groupChoose();
 
@@ -532,18 +527,10 @@ void CWelfareDlg::OnBnClickedForcast()
 			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
 			m_listCode.AddString(tmp);	
 		}
-		m_groupChoose.EnableWindow(false);
 		totalCodeCount = ec->dvCode.size();
 		CString stat;
-		// 组选
-		if(true||m_groupChoose.GetCheck())
-		{
-			stat.Format(_T("组选：初步预测3D码数: %d注。"),ec->dvCode.size());
-			m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));
-		}else{
-			stat.Format(_T("直选：初步预测3D码数: %d注。"),ec->dvCode.size());
-			m_StatusBar.SetPaneText(0,_T("组码规则: 直选"));		
-		}		
+		stat.Format(_T("组选：初步预测3D码数: %d注。"),ec->dvCode.size());
+		m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));		
 		m_REInfo.SetWindowTextW(stat);
 		m_deCheck.EnableWindow(true);
 	}else{
@@ -613,6 +600,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
+
 	// 解析定三码
 	CString threeStr;
 	m_three.GetWindowTextW(threeStr);
@@ -669,6 +657,8 @@ void CWelfareDlg::OnBnClickedKillcode()
 			int codeSum = it->codeSeq[0]+it->codeSeq[1]+it->codeSeq[2];
 			if(codeSum>20 || codeSum < 10)
 			{
+				//if(ec->getIsMerge())
+				//	ec->recycleBin.push_back(*it);
 				it = ec->dvCode.erase(it);
 				siftCount++;
 				continue;
@@ -681,6 +671,8 @@ void CWelfareDlg::OnBnClickedKillcode()
 				(it->codeSeq[0]%2==0 && it->codeSeq[1]%2==0 && it->codeSeq[2]%2==0))
 			{
 				oeCount++;
+				//if(ec->getIsMerge())
+				//	ec->recycleBin.push_back(*it);
 				it = ec->dvCode.erase(it);
 				continue;
 			}
@@ -691,6 +683,8 @@ void CWelfareDlg::OnBnClickedKillcode()
 			if(isExtreme(it))
 			{
 				blCount++;
+				//if(ec->getIsMerge())
+				//	ec->recycleBin.push_back(*it);
 				it = ec->dvCode.erase(it);
 				continue;
 			}
@@ -736,6 +730,77 @@ BOOL IsPair(vector<CodeType>::iterator it){
 		return true;
 	}
 	return false;
+}
+
+// 全大全小
+bool isABM(const vector<CodeType>::iterator it){
+	if(isExtreme(it)){
+		return true;
+	}	
+	return false;
+}
+// 全集全偶
+bool isAOE(const vector<CodeType>::iterator it){
+	if((it->codeSeq[0]%2!=0 && it->codeSeq[1]%2!=0 && it->codeSeq[2] % 2 !=0) || 
+		(it->codeSeq[0]%2==0 && it->codeSeq[1]%2==0 && it->codeSeq[2]%2==0))
+	{
+		return true;
+	}
+	return false;
+}
+// 两头
+bool isTD(const vector<CodeType>::iterator it){
+	int codeSum = it->codeSeq[0]+it->codeSeq[1]+it->codeSeq[2];
+	if(codeSum>20 || codeSum < 10){
+		return true;
+	}
+	return false;
+}
+
+// 大和
+bool isBS(const vector<CodeType>::iterator it){
+	if((it->codeSeq[0] + it->codeSeq[1] + it->codeSeq[2])>20){
+		return true;
+	}
+	return false;
+}
+
+
+// 从回收站找出特定类型的3D码，并区分对子非对子
+void selectCode(vector<CodeType> &vp,vector<CodeType> &vn, vector<CodeType> vec,bool (*func)(const vector<CodeType>::iterator)){
+	for(vector<CodeType>::iterator it = vec.begin(); it!=vec.end(); it++){
+		if(func(it)){
+			if(IsPair(it)){
+				vp.push_back(*it);
+			}else{
+				vn.push_back(*it);
+			}
+		}
+	}
+}
+
+// 打印数据
+void printVector(CSelection oSel,vector<CodeType> vec, CString mTitle){
+	CString spacestr = _T("      ");
+	CString separator = _T("\n-------------------------------");
+	CMyFont font = oSel.get_Font();
+	font.put_Size( 12 );
+	CString str;
+	str.Format(_T(" \n\n※ "));
+	oSel.TypeText(str + mTitle);
+	oSel.TypeText(separator);
+	font.put_Size( 14 );
+	oSel.TypeParagraph();
+	for(vector<CodeType>::iterator it =vec.begin(); it!=vec.end(); it++){
+			CString tmp ;
+			tmp.Format(_T("[%d]%d%d%d-%d"),it->frequency,it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+			oSel.TypeText(tmp);
+			oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
+			font.put_Size( 10 );
+			oSel.MoveRight(COleVariant((short)2),COleVariant((short)1),COleVariant((short)0));
+			font.put_Size( 14 );
+			oSel.TypeText(spacestr);
+	}
 }
 
 /**
@@ -873,6 +938,46 @@ void CWelfareDlg::OnBnClickedExport()
 	pairCode.clear();
 	nonpairCode.clear();
 
+	if(ec->getIsMerge() && outputCheck.GetCheck() && ec->recycleBin.size()>0){
+		ec->orderForRecycleBin();
+
+		vector<CodeType> vp;
+		vector<CodeType> vn;
+		CString mTitle;
+
+		selectCode(vp,vn,ec->recycleBin,isBS);
+		mTitle.Format(_T("杀大和·对子[ %d ]注"),vp.size());
+		printVector(oSel,vp,mTitle);
+		mTitle.Format(_T("杀大和·非对子[ %d ]注"),vn.size());
+		printVector(oSel,vn,mTitle);
+		vp.clear();
+		vn.clear();
+
+		selectCode(vp,vn,ec->recycleBin,isTD);
+		mTitle.Format(_T("杀两端·对子[ %d ]注"),vp.size());
+		printVector(oSel,vp,mTitle);
+		mTitle.Format(_T("杀两端·非对子[ %d ]注"),vn.size());
+		printVector(oSel,vn,mTitle);
+		vp.clear();
+		vn.clear();
+
+		selectCode(vp,vn,ec->recycleBin,isABM);
+		mTitle.Format(_T("杀全大全小·对子[ %d ]注"),vp.size());
+		printVector(oSel,vp,mTitle);
+		mTitle.Format(_T("杀全大全小·非对子[ %d ]注"),vn.size());
+		printVector(oSel,vn,mTitle);
+		vp.clear();
+		vn.clear();
+
+		selectCode(vp,vn,ec->recycleBin,isAOE);
+		mTitle.Format(_T("杀全奇全偶·对子[ %d ]注"),vp.size());
+		printVector(oSel,vp,mTitle);
+		mTitle.Format(_T("杀全奇全偶·非对子[ %d ]注"),vn.size());
+		printVector(oSel,vn,mTitle);
+		vp.clear();
+		vn.clear();
+	}
+
 	CString stat;
 	stat.Format(_T("预测已经导出,3D码:%d 注"),count);
 	m_REInfo.SetWindowTextW(stat);
@@ -881,7 +986,6 @@ void CWelfareDlg::OnBnClickedExport()
 	oWordApp.put_Visible(true);
 	
 }
-
 
 void CWelfareDlg::OnBnClickedReset()
 {
@@ -909,7 +1013,6 @@ void CWelfareDlg::OnBnClickedReset()
 	m_hundred.SetWindowTextW(_T(""));
 	m_decade.SetWindowTextW(_T(""));
 	m_unit.SetWindowTextW(_T(""));
-	m_groupChoose.EnableWindow(true);
 	m_dshou.SetWindowTextW(_T(""));
 	m_deCheck.EnableWindow(false);
 	m_deCheck.SetCheck(false);
@@ -1032,6 +1135,8 @@ void CWelfareDlg::OnClickedSift()
 			int codeSum = it->codeSeq[0]+it->codeSeq[1]+it->codeSeq[2];
 			if(codeSum>20 || codeSum < 10)
 			{
+				if(ec->getIsMerge())
+					ec->recycleBin.push_back(*it);
 				it = ec->dvCode.erase(it);
 				delCount++;
 				continue;
@@ -1126,6 +1231,8 @@ void CWelfareDlg::OnBnClickedKilloddeven()
 				(it->codeSeq[0]%2==0 && it->codeSeq[1]%2==0 && it->codeSeq[2]%2==0))
 			{
 				delCount++;
+				if(ec->getIsMerge())
+					ec->recycleBin.push_back(*it);
 				it = ec->dvCode.erase(it);
 				continue;
 			}
@@ -1177,6 +1284,8 @@ void CWelfareDlg::OnBnClickedKillbiglittle()
 			if(isExtreme(it))
 			{
 				delCount++;
+				if(ec->getIsMerge())
+					ec->recycleBin.push_back(*it);
 				it = ec->dvCode.erase(it);
 				continue;
 			}

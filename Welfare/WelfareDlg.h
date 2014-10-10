@@ -121,7 +121,7 @@ public:
 	afx_msg void OnBnClickedKillpair();
 	afx_msg void OnBnClickedKilloddeven();
 	afx_msg void OnBnClickedKillbiglittle();
-	CButton m_groupChoose;
+//	CButton m_groupChoose;
 	CEdit m_hundred;
 	CEdit m_decade;
 	CEdit m_unit;
@@ -144,6 +144,7 @@ public:
 	afx_msg void OnBnClickedClearall();
 	afx_msg void OnBnClickedCompositeselect();
 	CButton mGenType;
+	CButton outputCheck;
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);
