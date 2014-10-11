@@ -271,7 +271,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.10)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.11)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -779,6 +779,20 @@ void selectCode(vector<CodeType> &vp,vector<CodeType> &vn, vector<CodeType> vec,
 	}
 }
 
+// 从回收站找出特定类型的3D码，并区分对子非对子
+void selectCode(vector<CodeType> &vp,vector<CodeType> &vn, vector<CodeType> vec,
+				bool (*func)(const vector<CodeType>::iterator),bool (*func2)(const vector<CodeType>::iterator)){
+	for(vector<CodeType>::iterator it = vec.begin(); it!=vec.end(); it++){
+		if(func(it) || func2(it)){
+			if(IsPair(it)){
+				vp.push_back(*it);
+			}else{
+				vn.push_back(*it);
+			}
+		}
+	}
+}
+
 // 打印数据
 void printVector(CSelection oSel,vector<CodeType> vec, CString mTitle){
 	CString spacestr = _T("      ");
@@ -904,7 +918,16 @@ void CWelfareDlg::OnBnClickedExport()
 	oSel.TypeText(separator);
 	font.put_Size( 14 );
 	oSel.TypeParagraph();
+	
+	bool flagExport = false;
+	vector<CodeType> vp;
+	vector<CodeType> vn;
 
+	if(ec->getIsMerge() && outputCheck.GetCheck() && ec->recycleBin.size()>0){
+		ec->orderForRecycleBin();
+		selectCode(vp,vn,ec->recycleBin,isTD,isAOE);
+		flagExport = true;
+	}
 
 	// 导出对子
 	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
@@ -916,6 +939,12 @@ void CWelfareDlg::OnBnClickedExport()
 		oSel.MoveRight(COleVariant((short)2),COleVariant((short)1),COleVariant((short)0));
 		font.put_Size( 14 );
 		oSel.TypeText(spacestr);
+	}
+	// 导出少数派对子
+	if(flagExport){
+		CString mTitle;
+		mTitle.Format(_T("少数派·对子[ %d ]注"),vp.size());
+		printVector(oSel,vp,mTitle);
 	}
 	font.put_Size( 12 );
 	str.Format(_T(" \n\n※ 非对子: %d 注 "),nonpairCode.size());
@@ -938,46 +967,14 @@ void CWelfareDlg::OnBnClickedExport()
 	pairCode.clear();
 	nonpairCode.clear();
 
-	if(ec->getIsMerge() && outputCheck.GetCheck() && ec->recycleBin.size()>0){
-		ec->orderForRecycleBin();
-
-		vector<CodeType> vp;
-		vector<CodeType> vn;
+	// 导出少数派非对子
+	if(flagExport){
 		CString mTitle;
-
-		selectCode(vp,vn,ec->recycleBin,isBS);
-		mTitle.Format(_T("杀大和·对子[ %d ]注"),vp.size());
-		printVector(oSel,vp,mTitle);
-		mTitle.Format(_T("杀大和·非对子[ %d ]注"),vn.size());
-		printVector(oSel,vn,mTitle);
-		vp.clear();
-		vn.clear();
-
-		selectCode(vp,vn,ec->recycleBin,isTD);
-		mTitle.Format(_T("杀两端·对子[ %d ]注"),vp.size());
-		printVector(oSel,vp,mTitle);
-		mTitle.Format(_T("杀两端·非对子[ %d ]注"),vn.size());
-		printVector(oSel,vn,mTitle);
-		vp.clear();
-		vn.clear();
-
-		selectCode(vp,vn,ec->recycleBin,isABM);
-		mTitle.Format(_T("杀全大全小·对子[ %d ]注"),vp.size());
-		printVector(oSel,vp,mTitle);
-		mTitle.Format(_T("杀全大全小·非对子[ %d ]注"),vn.size());
-		printVector(oSel,vn,mTitle);
-		vp.clear();
-		vn.clear();
-
-		selectCode(vp,vn,ec->recycleBin,isAOE);
-		mTitle.Format(_T("杀全奇全偶·对子[ %d ]注"),vp.size());
-		printVector(oSel,vp,mTitle);
-		mTitle.Format(_T("杀全奇全偶·非对子[ %d ]注"),vn.size());
+		mTitle.Format(_T("少数派·非对子[ %d ]注"),vn.size());
 		printVector(oSel,vn,mTitle);
 		vp.clear();
 		vn.clear();
 	}
-
 	CString stat;
 	stat.Format(_T("预测已经导出,3D码:%d 注"),count);
 	m_REInfo.SetWindowTextW(stat);

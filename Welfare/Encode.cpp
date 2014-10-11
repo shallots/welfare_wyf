@@ -303,7 +303,7 @@ int Encode::ordering()
 int Encode::orderForRecycleBin(){
 	if(!codeFlag)
 		return 0;
-	sort(recycleBin.begin(),recycleBin.end(),comp);
+	sort(recycleBin.begin(),recycleBin.end(),compWithFreq);
 	return 1;
 }
 
