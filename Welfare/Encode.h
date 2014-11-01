@@ -43,6 +43,10 @@ public:
 	int encodingThree(vector<int>, vector<int>, vector<int>);
 	int encodingTwo(vector<int>, vector<int>, vector<int>);
 	int encoding(vector<int>, vector<int>, vector<int>,bool);
+	// 1向量编码，成功，返回完成的编码个数
+	int encoding(vector<int>);
+	// 1向量编码，bool为真，则进行编码，bool为假，则只改变频度
+	int encoding(vector<int>,bool);
 	// 4向量编码函数，成功，返回编码个数
 	int encoding(vector<int>, vector<int>, vector<int>, vector<int>,bool);
 	// 去重
@@ -57,8 +61,11 @@ public:
 	// 按频度排序
 	int orderByFreq();
 
+	// 和值尾改变频度
+	int AdjustFreqByMantissa(vector<int>);
+
 	// 杀码，返回杀码个数
-	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
+	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
 	// 筛选和值
 	int siftPlus(int min, int max);
 

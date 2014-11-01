@@ -108,9 +108,9 @@ CWelfareDlg::~CWelfareDlg()
 void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_ARR1, m_arr1);
-	DDX_Control(pDX, IDC_ARR2, m_arr2);
-	DDX_Control(pDX, IDC_ARR3, m_arr3);
+	//  DDX_Control(pDX, IDC_ARR1, m_arr1);
+	//  DDX_Control(pDX, IDC_ARR2, m_arr2);
+	//  DDX_Control(pDX, IDC_ARR3, m_arr3);
 	DDX_Control(pDX, IDC_BOLDCODE, m_boldCode);
 	DDX_Control(pDX, IDC_CHECKTIP, m_checkTip);
 	DDX_Control(pDX, IDC_EXPORT, m_export);
@@ -126,7 +126,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SIFT, m_sift);
 	//DDX_Control(pDX, IDC_DIRECT, m_direct);
 	//  DDX_Control(pDX, IDC_PREPRINT, m_prePrint);
-	DDX_Control(pDX, IDC_ARR4, m_arr4);
+	//  DDX_Control(pDX, IDC_ARR4, m_arr4);
 	DDX_Control(pDX, IDC_KILLBIGLITTLE, m_killABL);
 	DDX_Control(pDX, IDC_KILLODDEVEN, m_killAOE);
 	//  DDX_Control(pDX, IDC_KILLPAIR, m_killPair);
@@ -141,8 +141,11 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_ISSUETTITLE, m_issueTitle);
 	DDX_Control(pDX, IDC_LIST1, mListc);
 	DDX_Control(pDX, IDC_ADDQUEUE, mAddQueue);
-	DDX_Control(pDX, IDC_RADIO1, mGenType);
+	//  DDX_Control(pDX, IDC_RADIO1, mGenType);
 	DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
+	DDX_Control(pDX, IDC_NUMARRAY, m_numArray);
+	DDX_Control(pDX, IDC_UPDATEFREQ1, m_updateFreq1);
+	DDX_Control(pDX, IDC_UPDATEFREQ2, m_updateFreq2);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -188,6 +191,9 @@ ON_NOTIFY(NM_CLICK, IDC_FORCASTQUEUE, &CWelfareDlg::OnClickForcastqueue)
 ON_NOTIFY(NM_DBLCLK, IDC_FORCASTQUEUE, &CWelfareDlg::OnDblclkForcastqueue)
 ON_BN_CLICKED(IDC_CLEARALL, &CWelfareDlg::OnBnClickedClearall)
 ON_BN_CLICKED(IDC_COMPOSITESELECT, &CWelfareDlg::OnBnClickedCompositeselect)
+ON_BN_CLICKED(IDC_RADIO1, &CWelfareDlg::OnBnClickedRadio1)
+ON_BN_CLICKED(IDC_UPDATEFREQ1, &CWelfareDlg::OnBnClickedUpdatefreq1)
+ON_BN_CLICKED(IDC_UPDATEFREQ2, &CWelfareDlg::OnBnClickedUpdatefreq2)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -222,13 +228,13 @@ BOOL CWelfareDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	m_arr1.SetLimitText(10);
-	m_arr2.SetLimitText(10);
-	m_arr3.SetLimitText(10);
-	m_arr4.SetLimitText(10);
+	m_numArray.SetLimitText(10);
+
 	m_checkTip.SetCheck(1);
 	outputCheck.SetCheck(1);
 	m_deCheck.EnableWindow(false);
+	m_updateFreq1.EnableWindow(false);
+	m_updateFreq2.EnableWindow(false);
 	// test
 	//m_listCode.AddString(_T("234-9"),RGB(154,50,205));
 	//m_sift.SetCheck(TRUE);
@@ -271,9 +277,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.11)"));
-	 
-	 mGenType.SetCheck(true);
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.11.01)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -422,44 +426,58 @@ void CWelfareDlg::OnSetfocusTwocode()
 	m_REInfo.SetWindowTextW(_T("请输入八卦二码，以“#”、“/”、“,”等任意单字符间隔符号隔开,\n如，09#34#45,68/23/90/69"));
 }
 
+vector<int> CString2Vector(CString cstr){
+	vector<int> vec;
+	int length = cstr.GetLength();
+	if(length>0){
+		
+		char *p = (LPSTR)(LPCTSTR)cstr;
+		for(int j=0; j<2*length; j=j+2)
+		{
+			int tmp = *(p+j) - 48;
+			vec.push_back(tmp);
+		}
+	}
+	return vec;
+}
+
+bool hasRepeat(vector<int> vec){
+	int flag[MAXSIZE] = {0};//
+	for(vector<int>::iterator it = vec.begin(); it != vec.end(); it++)
+	{
+		if( flag[*it] == 1)
+		{
+			return true;
+		}else{
+			flag[*it] = 1;
+		}
+	}
+	return false;
+}
 
 void CWelfareDlg::OnBnClickedForcast()
 {
 	if(ec == NULL || ec->getIsInQueue()){  // 新预测,创建新对象
 		ec = new Encode();
-		//forcastFlag = false;
+		forcastFlag = false;
 	}
-	// TODO: 在此添加控件通知处理程序代码
 	if(forcastFlag)
 	{
 		ec->eraseCode();
 		m_listCode.ResetContent();
 		forcastFlag = FALSE;
 	}
-
-	CString csarr[4];
+	uVec1.clear();
+	uVec2.clear();
+	CString csarr[1];
 	int arrCount = 0;
-	int nullArrIndex = -1;
-	m_arr1.GetWindowTextW(csarr[0]);
-	m_arr2.GetWindowTextW(csarr[1]);
-	m_arr3.GetWindowTextW(csarr[2]);
-	m_arr4.GetWindowTextW(csarr[3]);
+	m_numArray.GetWindowTextW(csarr[0]);
 
-	//MessageBoxW(csarr[0] + "-" + csarr[1] + "-" + csarr[2] + "-" + csarr[3]);
-	
-	for(int i=0; i<4; i++)
+	if(csarr[0].GetLength() > 0)
 	{
-		if(csarr[i].GetLength()>=1)
-			arrCount++;
-		else
-			nullArrIndex = i;
-	}
-
-	if(arrCount >= 3 && arrCount <= 4)
-	{
-		vector<int> arr[4];
+		vector<int> arr[1];
 		
-		for(int i=0; i<4; i++)
+		for(int i=0; i<1; i++)
 		{
 			int length = csarr[i].GetLength();
 			char *p = (LPSTR)(LPCTSTR)csarr[i];
@@ -470,11 +488,10 @@ void CWelfareDlg::OnBnClickedForcast()
 			}
 		}
 		
-		// 判断各组序列是否有数字重复
-		for(int i=0; i<4; i++)
+		// 判断各组序列是否有数字重复,简单技巧
+		for(int i=0; i<1; i++)
 		{
-			int flag[MAXSIZE] = {0};// = new int(MAXSIZE);
-			//memset(flag,0,MAXSIZE);
+			int flag[MAXSIZE] = {0};//
 			for(vector<int>::iterator it = arr[i].begin(); it != arr[i].end(); it++)
 			{
 				if( flag[*it] == 1)
@@ -488,51 +505,31 @@ void CWelfareDlg::OnBnClickedForcast()
 				}
 			}
 		}
-		if(arrCount ==3)
-		{
-			int indexFlag[3];
-			int j=0;
-			for(int i=0; i<4; i++)
+		int codeSize = ec->encoding(arr[0],!forcastFlag);
+		if(!forcastFlag && codeSize>0){
+			ec->groupChoose();
+			// 和值尾有序化
+			ec->ordering();
+
+			// 输出到右边列表中
+			m_listCode.ResetContent();
+			for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); it++)
 			{
-				if(i==nullArrIndex)
-					continue;
-				indexFlag[j++] = i;
+				CString tmp;
+				tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+				m_listCode.AddString(tmp);	
 			}
-			if(ec->encoding(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]],mGenType.GetCheck()))
-			{
-				forcastFlag = TRUE;
-				arr[0].clear();
-				arr[1].clear();
-				arr[2].clear();
-			}else
-				return;
-		}else if (arrCount == 4 && ec->encoding(arr[0],arr[1],arr[2],arr[3],mGenType.GetCheck())){
-
-			forcastFlag = TRUE;
-			arr[0].clear();
-			arr[1].clear();
-			arr[2].clear();
-			arr[3].clear();
+			totalCodeCount = ec->dvCode.size();
+			CString stat;
+			stat.Format(_T("组选：初步预测3D码数: %d注。"),ec->dvCode.size());
+			m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));		
+			m_REInfo.SetWindowTextW(stat);
+			forcastFlag = true;
+			m_updateFreq1.EnableWindow(true);
+			m_updateFreq2.EnableWindow(true);
 		}
-
-		ec->groupChoose();
-
-		// 和值尾有序化
-		ec->ordering();
-
-		// 输出到右边列表中
-		for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); it++)
-		{
-			CString tmp;
-			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
-			m_listCode.AddString(tmp);	
-		}
-		totalCodeCount = ec->dvCode.size();
-		CString stat;
-		stat.Format(_T("组选：初步预测3D码数: %d注。"),ec->dvCode.size());
-		m_StatusBar.SetPaneText(0,_T("组码规则: 组选"));		
-		m_REInfo.SetWindowTextW(stat);
 		m_deCheck.EnableWindow(true);
+
 	}else{
 		m_REInfo.SetWindowTextW(_T("输入数据不完整,请仔细检查!"));
 	}
@@ -542,28 +539,28 @@ void CWelfareDlg::OnBnClickedForcast()
 void CWelfareDlg::OnBnClickedKillcode()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if(!forcastFlag)
+	if(!ec->getIsInQueue() && !forcastFlag)
 	{
 		MessageBox(_T("预测后再杀码"),_T("提示"),MB_OK);
 		return;
 	}
 	vector<Gossip> gossip;
-	vector<int> arrkc[5];
-	CString csstr[5];
+	vector<int> arrkc[4];
+	CString csstr[4];
 	CString sgossip;
 
-	m_plusTail.GetWindowTextW(csstr[0]);
-	m_boldCode.GetWindowTextW(csstr[1]);
-	m_hundred.GetWindowTextW(csstr[2]);
-	m_decade.GetWindowTextW(csstr[3]);
-	m_unit.GetWindowTextW(csstr[4]);
+	m_boldCode.GetWindowTextW(csstr[0]);
+	m_hundred.GetWindowTextW(csstr[1]);
+	m_decade.GetWindowTextW(csstr[2]);
+	m_unit.GetWindowTextW(csstr[3]);
 	m_twoCode.GetWindowTextW(sgossip);
+
 	int count = 0;
-	if(csstr[0].GetLength()||csstr[1].GetLength()
-		|| sgossip.GetLength()||csstr[2].GetLength()||csstr[3].GetLength()
-		||csstr[4].GetLength())
+	if(csstr[0].GetLength()
+		|| sgossip.GetLength()||csstr[1].GetLength()||csstr[2].GetLength()
+		||csstr[3].GetLength())
 	{
-		for(int i=0; i<5; i++)
+		for(int i=0; i<4; i++)
 		{
 			int length = csstr[i].GetLength();
 			char *p = (LPSTR)(LPCTSTR)csstr[i];
@@ -596,7 +593,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 			}
 		}
 
-		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],arrkc[4],gossip);
+		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],gossip);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
@@ -827,7 +824,7 @@ void CWelfareDlg::OnBnClickedExport()
 
 	oddCodeCount = count;
 	killCodeCount = totalCodeCount - oddCodeCount ;
-	if(!forcastFlag ||(count <= 0 && ec->dvCode.size() <= 0))
+	if(!ec->getIsInQueue() &&( !forcastFlag ||(count <= 0 && ec->dvCode.size() <= 0)))
 	{
 		m_REInfo.SetWindowTextW(_T("未预测或列表编码为空"));
 		return;
@@ -998,11 +995,10 @@ void CWelfareDlg::OnBnClickedReset()
 	killCodeCount = 0;
 	oddCodeCount = 0;
 	queueNum = 0;
+	uVec1.clear();
+	uVec2.clear();
 	m_issue.SetWindowTextW(_T(""));
-	m_arr1.SetWindowTextW(_T(""));
-	m_arr2.SetWindowTextW(_T(""));
-	m_arr3.SetWindowTextW(_T(""));
-	m_arr4.SetWindowTextW(_T(""));
+	m_numArray.SetWindowTextW(_T(""));
 	m_plusTail.SetWindowTextW(_T(""));
 	m_boldCode.SetWindowTextW(_T(""));
 	m_twoCode.SetWindowTextW(_T(""));
@@ -1017,6 +1013,8 @@ void CWelfareDlg::OnBnClickedReset()
 	m_killABL.SetCheck(false);
 	m_killAOE.SetCheck(false);
 	m_sift.SetCheck(false);
+	m_updateFreq1.EnableWindow(false);
+	m_updateFreq2.EnableWindow(false);
 	m_StatusBar.SetPaneText(0,_T("欢迎使用！"));
 	forcastFlag = FALSE;
 }
@@ -1117,7 +1115,7 @@ int isInSift(CString code)
 void CWelfareDlg::OnClickedSift()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if(forcastFlag && m_sift.GetCheck())
+	if((forcastFlag || ec->getIsInQueue()) && m_sift.GetCheck())
 	{
 		if(IDOK != MessageBox(_T("选择确定，则删除和值不在10~20的3D码，否则不删除"),_T("提示"),MB_OKCANCEL))
 		{
@@ -1212,7 +1210,7 @@ void CWelfareDlg::OnSelchangeListcode()
 void CWelfareDlg::OnBnClickedKilloddeven()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if(forcastFlag && m_killAOE.GetCheck())
+	if((forcastFlag || ec->getIsInQueue()) && m_killAOE.GetCheck())
 	{
 		if(IDOK != MessageBox(_T("选择确定，则删除各位全奇或全偶的3D码，否则不删除"),_T("提示"),MB_OKCANCEL))
 		{
@@ -1264,7 +1262,7 @@ BOOL isExtreme(const vector<CodeType>::iterator it){
 
 void CWelfareDlg::OnBnClickedKillbiglittle()
 {
-	if(forcastFlag && m_killABL.GetCheck())
+	if((forcastFlag || ec->getIsInQueue()) && m_killABL.GetCheck())
 	{
 		if(IDOK != MessageBox(_T("选择确定，则删除各位全大或全小的3D码，否则不删除"),_T("提示"),MB_OKCANCEL))
 		{
@@ -1357,7 +1355,7 @@ void CWelfareDlg::OnSetfocusDshou()
 void CWelfareDlg::OnClickedDecheck()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if(forcastFlag && m_deCheck.GetCheck()){
+	if((forcastFlag || ec->getIsInQueue()) && m_deCheck.GetCheck()){
 		ec->grouptodirect();
 
 		m_listCode.ResetContent();
@@ -1380,7 +1378,7 @@ void CWelfareDlg::OnClickedDecheck()
 void CWelfareDlg::OnClickedBigsum()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if(forcastFlag && m_bigSum.GetCheck()){
+	if((forcastFlag || ec->getIsInQueue()) && m_bigSum.GetCheck()){
 
 		if(IDOK != MessageBox(_T("选择是，将杀掉和尾值大于20的3D码？"),_T("杀大和提示"),MB_OKCANCEL))
 		{
@@ -1495,7 +1493,7 @@ void CWelfareDlg::OnBnClickedCompositeselect()
 {
 	if(mListc.GetItemCount() == 0)
 	{
-		 MessageBox(_T("请先设置预测队列"),_T("提示"),MB_OKCANCEL);
+		 MessageBox(_T("请先添加预测队列"),_T("提示"),MB_OKCANCEL);
 		 return;
 	}
 	CString mergeTitle(_T("组"));
@@ -1503,7 +1501,7 @@ void CWelfareDlg::OnBnClickedCompositeselect()
 	ec = new Encode();
 	for (int i=0; i<mListc.GetItemCount(); i++){
 		//if(mListc.GetItemState(i,LVIS_SELECTED) == LVIS_SELECTED || mListc.GetCheck(i)){
-			if(((i+1)>ecVector.size()) || ecVector[i]->getIsMerge() ||!ecVector[i]->getIsInQueue())
+			if(((i+1)>(int)ecVector.size()) || ecVector[i]->getIsMerge() ||!ecVector[i]->getIsInQueue())
 				continue;
 			int flag = ec->merge(ecVector[i]);
 			if(flag == -1){
@@ -1534,4 +1532,79 @@ void CWelfareDlg::OnBnClickedCompositeselect()
 	CString infoM;
 	infoM.Format(_T("归并完成，共 %d 注3D码.如需查看频度，请导出文件。"),ec->dvCode.size());
 	m_REInfo.SetWindowTextW(infoM);
+}
+
+
+void CWelfareDlg::OnBnClickedRadio1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+bool isInVector(CString cstr, vector<CString> vec){
+	for(vector<CString>::iterator it = vec.begin(); it!=vec.end(); it++){
+		if(cstr.Compare(*it)==0){
+			return true;
+		}
+	}
+	return false;
+}
+CString vec2CString(vector<CString> vec,CString cstr){
+	CString tmp;
+	for(vector<CString>::iterator it = vec.begin(); it!=vec.end(); it++){
+		if(!cstr.IsEmpty() && cstr.Compare(*it)==0){
+			tmp += _T("★");
+		}
+		tmp += *it + _T("\n");
+	}
+	return tmp;
+}
+void CWelfareDlg::OnBnClickedUpdatefreq1()
+{
+	CString tmp;
+	m_numArray.GetWindowTextW(tmp);
+	if(tmp.GetLength()>0){
+		CString stat;
+		if(isInVector(tmp,uVec1)){
+			stat.Format(tmp+_T(":该组数据已经本次预测中检测过!!\n"));
+			stat += vec2CString(uVec1,tmp);
+			m_REInfo.SetWindowTextW(stat);
+			if(IDOK != MessageBox(stat+_T("是否继续?"),_T("提示"),MB_OKCANCEL))
+			{
+				return;
+			}
+		}else{
+			uVec1.push_back(tmp);
+		}
+		vector<int> vec = CString2Vector(tmp);
+		int codeSize = ec->encoding(vec,false);
+		
+		stat.Format(_T("频度更新,本次操作影响3D码注数: %d注。"),codeSize);
+		m_REInfo.SetWindowTextW(stat);
+	}
+}
+
+
+void CWelfareDlg::OnBnClickedUpdatefreq2()
+{
+	CString tmp;
+	m_plusTail.GetWindowTextW(tmp);
+	if(tmp.GetLength()>0){
+		CString stat;
+		if(isInVector(tmp,uVec2)){
+			stat.Format(tmp+_T(":该组数据已经本次预测中检测过!!\n"));
+			stat += vec2CString(uVec2,tmp);
+			m_REInfo.SetWindowTextW(stat);
+			if(IDOK != MessageBox(stat+_T("是否继续?"),_T("提示"),MB_OKCANCEL))
+			{
+				return;
+			}
+		}else{
+			uVec2.push_back(tmp);
+		}
+		vector<int> vec = CString2Vector(tmp);
+		int codeSize = ec->AdjustFreqByMantissa(vec);
+
+		stat.Format(_T("频度更新,本次操作影响3D码注数: %d注。"),codeSize);
+		m_REInfo.SetWindowTextW(stat);
+	}
 }

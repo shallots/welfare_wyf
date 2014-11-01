@@ -51,6 +51,10 @@ public:
 	int killCodeCount;	// 杀码数
 	int oddCodeCount;	// 余码数
 
+	// 更新频度向量
+	vector<CString> uVec1;
+	vector<CString> uVec2;
+
 	int queueNum;
 
 	CStatusBar m_StatusBar; // 状态栏
@@ -72,9 +76,9 @@ protected:
 	virtual void OnCancel();
 	DECLARE_MESSAGE_MAP()
 public:
-	CEdit m_arr1;
-	CEdit m_arr2;
-	CEdit m_arr3;
+//	CEdit m_arr1;
+//	CEdit m_arr2;
+//	CEdit m_arr3;
 	CEdit m_boldCode;
 	CButton m_checkTip;
 	CButton m_export;
@@ -111,7 +115,7 @@ public:
 	afx_msg void OnQuit();
 //	CButton m_prePrint;
 //	afx_msg void OnBnClickedPreprint();
-	CEdit m_arr4;
+//	CEdit m_arr4;
 	afx_msg void OnSetfocusArr4();
 	afx_msg void OnAbout();
 	afx_msg void OnSelchangeListcode();
@@ -143,8 +147,16 @@ public:
 	afx_msg void OnDblclkForcastqueue(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedClearall();
 	afx_msg void OnBnClickedCompositeselect();
-	CButton mGenType;
+//	CButton mGenType;
 	CButton outputCheck;
+	afx_msg void OnBnClickedRadio1();
+	CEdit m_numArray;
+	CButton m_updateFreq1;
+	CButton m_updateFreq2;
+	afx_msg void OnBnClickedUpdatefreq1();
+	afx_msg void OnBnClickedUpdatefreq2();
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);
+bool hasRepeat(vector<int> vec);
+vector<int> CString2Vector(CString cstr);

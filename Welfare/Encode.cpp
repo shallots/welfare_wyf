@@ -13,6 +13,88 @@ Encode::~Encode()
 {
 	eraseCode();
 }
+/*********************************************************
+判定和值尾是否包含于da中
+*********************************************************/
+int Encode::AdjustFreqByMantissa(vector<int> da){
+	if(da.size()<1)
+		return 0;
+	int count = 0;
+	for(vector<CodeType>::iterator it=dvCode.begin(); it!=dvCode.end(); it++){
+		for(vector<int>::iterator ita = da.begin(); ita!=da.end(); ita++){
+			if(it->mantissa == *ita){
+				it->frequency++;
+				count ++;
+			}
+		}
+	}
+	return count;
+}
+
+/*********************************************************
+判定it中是否包含da中的一个或多个数字
+*********************************************************/
+bool hasIntersection(const vector<CodeType>::iterator it, vector<int> da){
+	bool flag = false;
+	for(vector<int>::iterator ita = da.begin(); ita!=da.end(); ita++){
+		if(it->codeSeq[0] == *ita || it->codeSeq[1] == *ita || it->codeSeq[2] == *ita){
+			flag = true;
+			break;
+		}
+	}
+	return flag;
+}
+/*********************************************************
+*	名称：1向量编码函数
+*	功能：使用一组整数向量进行编码
+*	参数：
+*		da,一组整数向量; flag为真，进行编码，flag为假更新频度
+*	作者:Hyw
+*	日期:14/11/01
+*	说明:新版要求只输入一组数据，即输出所有3D码，后面的输入只改变频度
+*********************************************************/
+int Encode::encoding(vector<int> da,bool flag){
+	if(flag || !codeFlag)
+		return encoding(da);
+	int count = 0;
+	for(vector<CodeType>::iterator ita = dvCode.begin(); ita!=dvCode.end(); ita++){
+		if(hasIntersection(ita,da)){
+			ita->frequency++;
+			count++;
+		}
+	}
+	return count;
+}
+
+/*********************************************************
+*	名称：1向量编码函数
+*	功能：使用一组整数向量进行编码
+*	参数：
+*		da,一组整数向量进行编码
+*	作者:Hyw
+*	日期:14/11/01
+*	说明:新版要求只输入一组数据，即输出所有3D码，后面的输入只改变频度
+*********************************************************/
+int Encode::encoding(vector<int> da){
+	if(da.size()<1 || codeFlag)
+		return 0;
+	for(vector<int>::iterator it = da.begin(); it!=da.end(); it++){
+		for(int i = 0; i<10; i++){
+			for(int j=0; j<10; j++){
+				CodeType tmp;
+				tmp.codeSeq[0] = *it;
+				tmp.codeSeq[1] = i;
+				tmp.codeSeq[2] = j;
+				int codeSum = (*it + i + j);
+				tmp.mantissa = codeSum % 10;
+				tmp.frequency = 1;
+				dvCode.push_back(tmp);	
+			}
+		}
+	}
+	codeFlag = true;
+	return dvCode.size();
+}
 
 /*********************************************************
 *	名称：三向量编码函数
@@ -320,7 +402,7 @@ int Encode::orderByFreq(){
 *	作者：Hyw
 *	日期：13/05/13
 ************************************************/
-int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
+int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
 {
 	if(!codeFlag)
 	{
@@ -329,7 +411,6 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	int count = 0;
 
 	// 杀码有序化
-	sort(plustail.begin(),plustail.end());
 	sort(boldcode.begin(),boldcode.end());
 	sort(hdr.begin(),hdr.end());
 	sort(decade.begin(),decade.end());
@@ -339,18 +420,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
 	{
 		bool flag = false;
-		
-		for(vector<int>::iterator it = plustail.begin(); it != plustail.end(); it++)
-		{
-			if(itcode->mantissa == *it)
-			{
-				flag = true;
-				break;
-			}else if((int)itcode->mantissa < *it)
-				break;
-		}
-
-		if(flag || (!plustail.size() && boldcode.size())) 
+		if(boldcode.size()) 
 		{
 			for(vector<int>::iterator it = boldcode.begin(); it != boldcode.end(); it++)
 			{
@@ -360,21 +430,19 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 				{
 					flag = true;
 					break;
-				}else{
-					flag = false;
 				}
 			}
 		}
 
 		// 胆码判定成功才能进入八卦二码杀码
-		if(flag || (!plustail.size() && !boldcode.size() && gossip.size()))
+		if(flag || (!boldcode.size() && gossip.size()))
 		{
 			for(vector<Gossip>::iterator it=gossip.begin(); it != gossip.end(); it++)
 			{
 				if((itcode->codeSeq[0] == it->x ||
 					itcode->codeSeq[1] == it->x ||
 					itcode->codeSeq[2] == it->x) &&
-				   (itcode->codeSeq[0] == it->y ||
+					(itcode->codeSeq[0] == it->y ||
 					itcode->codeSeq[1] == it->y ||
 					itcode->codeSeq[2] == it->y))
 				{
@@ -387,7 +455,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 			}
 		}
 
-		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() &&hdr.size()))
+		if(flag || (!boldcode.size() && !gossip.size() &&hdr.size()))
 		{
 			for(vector<int>::iterator it=hdr.begin(); it!=hdr.end(); it++)
 			{
@@ -400,7 +468,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 				}
 			}
 		}
-		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() && !hdr.size() &&decade.size()))
+		if(flag || (!boldcode.size() && !gossip.size() && !hdr.size() &&decade.size()))
 		{
 			for(vector<int>::iterator it=decade.begin(); it!=decade.end(); it++)
 			{
@@ -413,7 +481,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 				}
 			}
 		}
-		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() && !hdr.size() && !decade.size() &&unit.size()))
+		if(flag || (!boldcode.size() && !gossip.size() && !hdr.size() && !decade.size() &&unit.size()))
 		{
 			for(vector<int>::iterator it=unit.begin(); it!=unit.end(); it++)
 			{
@@ -426,7 +494,6 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 				}
 			}
 		}
-		
 		if(!flag)
 		{
 			itcode = dvCode.erase(itcode);
@@ -435,7 +502,6 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 			itcode ++;
 		}
 	}
-
 	return count;
 }
 
@@ -655,7 +721,6 @@ int Encode::grouptodirect(){
 	codetype = DIRECT;
 	return dvCode.size();
 }
-
 
 int Encode::killBig(int big){
 	int count = 0;
