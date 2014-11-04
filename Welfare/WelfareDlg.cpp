@@ -231,7 +231,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	m_numArray.SetLimitText(10);
 
 	m_checkTip.SetCheck(1);
-	outputCheck.SetCheck(1);
+	//outputCheck.SetCheck(1);
 	m_deCheck.EnableWindow(false);
 	m_updateFreq1.EnableWindow(false);
 	m_updateFreq2.EnableWindow(false);
@@ -277,7 +277,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.11.01)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.11.02)"));
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -845,16 +845,19 @@ void CWelfareDlg::OnBnClickedExport()
 	vector<CString> pairCode;
 	vector<CString> nonpairCode;
 
-	CString spacestr = _T("      ");
+	CString spacestr = _T("    ");
 	CString separator = _T("\n-------------------------------");
 
+	// 排序
+	ec->orderByFreq();
 	// 根据 ec->dvCode 组码
 	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it!=ec->dvCode.end(); it++){
 		CString tmp;
-		if(ec->getIsMerge())
-			tmp.Format(_T("[%d]%d%d%d-%d"),it->frequency,it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
-		else
-			tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		//if(ec->getIsMerge())
+		//	tmp.Format(_T("[%d]%d%d%d-%d"),it->frequency,it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		//else
+		//	tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		tmp.Format(_T("[%d]%d%d%d-%d"),it->frequency,it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
 		if(IsPair(it)){
 			pairCode.push_back(tmp);
 		}else{
@@ -950,7 +953,7 @@ void CWelfareDlg::OnBnClickedExport()
 	font.put_Size( 14 );
 	oSel.TypeParagraph();
 
-	// 导出对子
+	// 导出非对子
 	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++)
 	{
 		CString tmp = *it;
