@@ -13,6 +13,7 @@ typedef struct
 	int codeSeq[3];
 	unsigned int mantissa;
 	int frequency;
+	int span;
 }CodeType;
 
 typedef struct
@@ -59,6 +60,10 @@ public:
 
 	// 杀码，返回杀码个数
 	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
+	
+	// 跨度选码
+	int selectBasedSpan(vector<int> span);
+
 	// 筛选和值
 	int siftPlus(int min, int max);
 

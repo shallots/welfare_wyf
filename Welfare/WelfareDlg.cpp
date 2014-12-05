@@ -143,6 +143,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ADDQUEUE, mAddQueue);
 	DDX_Control(pDX, IDC_RADIO1, mGenType);
 	DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
+	DDX_Control(pDX, IDC_KUADU, m_kuaDu);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -271,7 +272,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.10.11)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.12.05)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -551,6 +552,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	vector<int> arrkc[5];
 	CString csstr[5];
 	CString sgossip;
+	CString mKuadu;
 
 	m_plusTail.GetWindowTextW(csstr[0]);
 	m_boldCode.GetWindowTextW(csstr[1]);
@@ -558,6 +560,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	m_decade.GetWindowTextW(csstr[3]);
 	m_unit.GetWindowTextW(csstr[4]);
 	m_twoCode.GetWindowTextW(sgossip);
+	m_kuaDu.GetWindowTextW(mKuadu);
 	int count = 0;
 	if(csstr[0].GetLength()||csstr[1].GetLength()
 		|| sgossip.GetLength()||csstr[2].GetLength()||csstr[3].GetLength()
@@ -595,12 +598,26 @@ void CWelfareDlg::OnBnClickedKillcode()
 				k += 2;
 			}
 		}
-
 		count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],arrkc[4],gossip);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
 
+	// 跨度选码
+	if(mKuadu.GetLength()>0){
+		int kLength = mKuadu.GetLength();
+		if(kLength>0){
+			vector<int> kd;
+			char *p = (LPSTR)(LPCTSTR)mKuadu;
+			for(int j=0; j<2*kLength; j=j+2)
+			{
+				int tmp = *(p+j) - 48;
+				kd.push_back(tmp);
+			}
+			// 跨度选码
+			count += ec->selectBasedSpan(kd);
+		}
+	}
 	// 解析定三码
 	CString threeStr;
 	m_three.GetWindowTextW(threeStr);

@@ -313,6 +313,40 @@ int Encode::orderByFreq(){
 	sort(dvCode.begin(),dvCode.end(),compWithFreq);
 	return 1;
 }
+/***********************************************
+*	名称：跨度选码
+*	功能：计算3D码的跨度，并筛选
+*	作者：Hyw
+*	日期：05/12/14
+************************************************/
+int Encode::selectBasedSpan(vector<int> span){
+	if(span.size()<1 || dvCode.size()<1)
+		return 0;
+	int count = 0;
+	for(vector<CodeType>::iterator it = dvCode.begin(); it!=dvCode.end(); ){
+		int max;
+		int min;
+		max = it->codeSeq[0]>it->codeSeq[1]?it->codeSeq[0]:it->codeSeq[1];
+		max = max>it->codeSeq[2]?max:it->codeSeq[2];
+		min = it->codeSeq[0]<it->codeSeq[1]?it->codeSeq[0]:it->codeSeq[1];
+		min = min<it->codeSeq[2]?min:it->codeSeq[2];
+		int eSpan = max - min;
+		bool flag = false;
+		for(vector<int>::iterator ita = span.begin(); ita!=span.end(); ita++){
+			if(eSpan == *ita){
+				flag = true;
+				break;
+			}
+		}
+		if(!flag){
+			it = dvCode.erase(it);
+			count++;
+		}else{
+			it++;
+		}
+	}
+	return count;
+}
 
 /***********************************************
 *	名称：基础杀码函数

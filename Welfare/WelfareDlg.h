@@ -145,6 +145,7 @@ public:
 	afx_msg void OnBnClickedCompositeselect();
 	CButton mGenType;
 	CButton outputCheck;
+	CEdit m_kuaDu;
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);
