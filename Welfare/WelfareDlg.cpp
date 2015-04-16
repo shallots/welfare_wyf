@@ -112,7 +112,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ARR2, m_arr2);
 	DDX_Control(pDX, IDC_ARR3, m_arr3);
 	DDX_Control(pDX, IDC_BOLDCODE, m_boldCode);
-	DDX_Control(pDX, IDC_CHECKTIP, m_checkTip);
+	//  DDX_Control(pDX, IDC_CHECKTIP, m_checkTip);
 	DDX_Control(pDX, IDC_EXPORT, m_export);
 	DDX_Control(pDX, IDC_FORCAST, m_forcast);
 	DDX_Control(pDX, IDC_ISSUE, m_issue);
@@ -121,7 +121,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_PLUSTAIL, m_plusTail);
 	DDX_Control(pDX, IDC_REINFO, m_REInfo);
 	DDX_Control(pDX, IDC_RESET, m_reset);
-	DDX_Control(pDX, IDC_REVOCATION, m_revocation);
+	//  DDX_Control(pDX, IDC_REVOCATION, m_revocation);
 	DDX_Control(pDX, IDC_TWOCODE, m_twoCode);
 	DDX_Control(pDX, IDC_SIFT, m_sift);
 	//DDX_Control(pDX, IDC_DIRECT, m_direct);
@@ -144,6 +144,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO1, mGenType);
 	DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
 	DDX_Control(pDX, IDC_KUADU, m_kuaDu);
+	DDX_Control(pDX, IDC_ADDTOASET, m_addToA);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -163,8 +164,8 @@ BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_KILLCODE, &CWelfareDlg::OnBnClickedKillcode)
 	ON_BN_CLICKED(IDC_EXPORT, &CWelfareDlg::OnBnClickedExport)
 	ON_BN_CLICKED(IDC_RESET, &CWelfareDlg::OnBnClickedReset)
-	ON_LBN_DBLCLK(IDC_LISTCODE, &CWelfareDlg::OnDblclkListcode)
-	ON_BN_CLICKED(IDC_REVOCATION, &CWelfareDlg::OnBnClickedRevocation)
+//	ON_LBN_DBLCLK(IDC_LISTCODE, &CWelfareDlg::OnDblclkListcode)
+//	ON_BN_CLICKED(IDC_REVOCATION, &CWelfareDlg::OnBnClickedRevocation)
 	ON_EN_CHANGE(IDC_TWOCODE, &CWelfareDlg::OnEnChangeTwocode)
 	ON_BN_CLICKED(IDC_SIFT, &CWelfareDlg::OnClickedSift)
 //	ON_BN_DOUBLECLICKED(IDC_SIFT, &CWelfareDlg::OnDoubleclickedSift)
@@ -189,6 +190,7 @@ ON_NOTIFY(NM_CLICK, IDC_FORCASTQUEUE, &CWelfareDlg::OnClickForcastqueue)
 ON_NOTIFY(NM_DBLCLK, IDC_FORCASTQUEUE, &CWelfareDlg::OnDblclkForcastqueue)
 ON_BN_CLICKED(IDC_CLEARALL, &CWelfareDlg::OnBnClickedClearall)
 ON_BN_CLICKED(IDC_COMPOSITESELECT, &CWelfareDlg::OnBnClickedCompositeselect)
+ON_BN_CLICKED(IDC_ADDTOASET, &CWelfareDlg::OnClickedAddtoaset)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -227,7 +229,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	m_arr2.SetLimitText(10);
 	m_arr3.SetLimitText(10);
 	m_arr4.SetLimitText(10);
-	m_checkTip.SetCheck(1);
+	//m_checkTip.SetCheck(1);
 	outputCheck.SetCheck(1);
 	m_deCheck.EnableWindow(false);
 	// test
@@ -272,7 +274,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.12.05)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.04.16)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -489,7 +491,7 @@ void CWelfareDlg::OnBnClickedForcast()
 				}
 			}
 		}
-		if(arrCount ==3)
+		if(3 == arrCount)
 		{
 			int indexFlag[3];
 			int j=0;
@@ -499,7 +501,7 @@ void CWelfareDlg::OnBnClickedForcast()
 					continue;
 				indexFlag[j++] = i;
 			}
-			if(ec->encoding(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]],mGenType.GetCheck()))
+			if(ec->encoding(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]],mGenType.GetCheck()) > 0)
 			{
 				forcastFlag = TRUE;
 				arr[0].clear();
@@ -507,7 +509,7 @@ void CWelfareDlg::OnBnClickedForcast()
 				arr[2].clear();
 			}else
 				return;
-		}else if (arrCount == 4 && ec->encoding(arr[0],arr[1],arr[2],arr[3],mGenType.GetCheck())){
+		}else if (4 == arrCount && ec->encoding(arr[0],arr[1],arr[2],arr[3],mGenType.GetCheck()) > 0){
 
 			forcastFlag = TRUE;
 			arr[0].clear();
@@ -840,7 +842,8 @@ void printVector(CSelection oSel,vector<CodeType> vec, CString mTitle){
 */
 void CWelfareDlg::OnBnClickedExport()
 {
-	int count = m_listCode.GetCount();
+	ec->getSupplementarySet(aSet);
+	int count = ec->dvCode.size();
 
 	oddCodeCount = count;
 	killCodeCount = totalCodeCount - oddCodeCount ;
@@ -1039,65 +1042,65 @@ void CWelfareDlg::OnBnClickedReset()
 }
 
 
-void CWelfareDlg::OnDblclkListcode()
-{
-	// TODO: 在此添加控件通知处理程序代码
+//void CWelfareDlg::OnDblclkListcode()
+//{
+//	// TODO: 在此添加控件通知处理程序代码
+//
+//	if(m_checkTip.GetCheck())
+//	{
+//		if(IDOK!=MessageBox(_T("确定，将会删除所选预测码，否则取消"),_T("提示"),MB_OKCANCEL))
+//		{
+//			return;
+//		}
+//	}
+//	RECOVER tmp;
+//	tmp.index = m_listCode.GetCurSel();
+//	m_listCode.GetText(tmp.index,tmp.code);
+//
+//	//memcpy(&tmp.ctCode,&(ec->dvCode.begin()+tmp.index),sizeof(CodeType));
+//	vector<CodeType>::iterator it = ec->dvCode.begin()+tmp.index;
+//	tmp.ctCode.mantissa = it->mantissa;
+//	tmp.ctCode.codeSeq[0] = it->codeSeq[0];
+//	tmp.ctCode.codeSeq[1] = it->codeSeq[1];
+//	tmp.ctCode.codeSeq[2] = it->codeSeq[2];
+//	recoverCodeStack.push(tmp);
+//	m_listCode.DeleteString(tmp.index);
+//	ec->dvCode.erase(ec->dvCode.begin()+tmp.index);
+//	m_listCode.SetCurSel(tmp.index-1);
+//	CString delString(tmp.code);
+//	delString += _T(" 已删除！");
+//	m_REInfo.SetWindowTextW(delString);
+//}
 
-	if(m_checkTip.GetCheck())
-	{
-		if(IDOK!=MessageBox(_T("确定，将会删除所选预测码，否则取消"),_T("提示"),MB_OKCANCEL))
-		{
-			return;
-		}
-	}
-	RECOVER tmp;
-	tmp.index = m_listCode.GetCurSel();
-	m_listCode.GetText(tmp.index,tmp.code);
 
-	//memcpy(&tmp.ctCode,&(ec->dvCode.begin()+tmp.index),sizeof(CodeType));
-	vector<CodeType>::iterator it = ec->dvCode.begin()+tmp.index;
-	tmp.ctCode.mantissa = it->mantissa;
-	tmp.ctCode.codeSeq[0] = it->codeSeq[0];
-	tmp.ctCode.codeSeq[1] = it->codeSeq[1];
-	tmp.ctCode.codeSeq[2] = it->codeSeq[2];
-	recoverCodeStack.push(tmp);
-	m_listCode.DeleteString(tmp.index);
-	ec->dvCode.erase(ec->dvCode.begin()+tmp.index);
-	m_listCode.SetCurSel(tmp.index-1);
-	CString delString(tmp.code);
-	delString += _T(" 已删除！");
-	m_REInfo.SetWindowTextW(delString);
-}
-
-
-void CWelfareDlg::OnBnClickedRevocation()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	if(recoverCodeStack.empty())
-	{
-		return;
-	}
-	RECOVER tmp;
-	tmp = recoverCodeStack.top();
-	recoverCodeStack.pop();
-	//int flag = isInSift(tmp.code);
-	//if(m_sift.GetCheck() && flag)
-	//{
-	//	if(flag == 1)
-	//	{
-	//		m_listCode.InsertString(tmp.index,tmp.code,RGB(154,50,205));
-	//	}else{
-	//		m_listCode.InsertString(tmp.index,tmp.code,RGB(255,0,0));
-	//	}
-	//}else
-	//	m_listCode.InsertString(tmp.index,tmp.code);
-
-	m_listCode.InsertString(tmp.index,tmp.code);
-	ec->dvCode.insert(ec->dvCode.begin()+tmp.index,tmp.ctCode);
-	CString revocationString(tmp.code);
-	revocationString += _T(" 已撤销删除！");
-	m_REInfo.SetWindowTextW(revocationString);
-}
+//void CWelfareDlg::OnBnClickedRevocation()
+//{
+//	// TODO: 在此添加控件通知处理程序代码
+//	if(recoverCodeStack.empty())
+//	{
+//		return;
+//	}
+//	RECOVER tmp;
+//	tmp = recoverCodeStack.top();
+//	recoverCodeStack.pop();
+//	//int flag = isInSift(tmp.code);
+//	//if(m_sift.GetCheck() && flag)
+//	//{
+//	//	if(flag == 1)
+//	//	{
+//	//		m_listCode.InsertString(tmp.index,tmp.code,RGB(154,50,205));
+//	//	}else{
+//	//		m_listCode.InsertString(tmp.index,tmp.code,RGB(255,0,0));
+//	//	}
+//	//}else
+//	//	m_listCode.InsertString(tmp.index,tmp.code);
+//
+//	m_listCode.InsertString(tmp.index,tmp.code);
+//	ec->dvCode.insert(ec->dvCode.begin()+tmp.index,tmp.ctCode);
+//	CString revocationString(tmp.code);
+//	revocationString += _T(" 已撤销删除！");
+//	m_REInfo.SetWindowTextW(revocationString);
+//}
 
 
 void CWelfareDlg::OnEnChangeTwocode()
@@ -1283,7 +1286,7 @@ void CWelfareDlg::OnBnClickedKillbiglittle()
 {
 	if(forcastFlag && m_killABL.GetCheck())
 	{
-		if(IDOK != MessageBox(_T("选择确定，则删除各位全大或全小的3D码，否则不删除"),_T("提示"),MB_OKCANCEL))
+		if(IDOK != MessageBox(_T("选择确定，则删除全大或全小的3D码，否则不删除"),_T("提示"),MB_OKCANCEL))
 		{
 			m_killABL.SetCheck(FALSE);
 			return;
@@ -1500,6 +1503,7 @@ void CWelfareDlg::OnBnClickedClearall()
 	// TODO: 在此添加控件通知处理程序代码
 	OnBnClickedReset();
 	ecVector.clear();
+	aSet.clear();
 	//if(ecVector.empty()){
 	//	MessageBoxW(_T("预测队列已经清空"));
 	//}
@@ -1520,7 +1524,7 @@ void CWelfareDlg::OnBnClickedCompositeselect()
 	ec = new Encode();
 	for (int i=0; i<mListc.GetItemCount(); i++){
 		//if(mListc.GetItemState(i,LVIS_SELECTED) == LVIS_SELECTED || mListc.GetCheck(i)){
-			if(((i+1)>ecVector.size()) || ecVector[i]->getIsMerge() ||!ecVector[i]->getIsInQueue())
+		if(((unsigned)(i+1)>ecVector.size()) || ecVector[i]->getIsMerge() ||!ecVector[i]->getIsInQueue())
 				continue;
 			int flag = ec->merge(ecVector[i]);
 			if(flag == -1){
@@ -1550,5 +1554,15 @@ void CWelfareDlg::OnBnClickedCompositeselect()
 	// 提示信息
 	CString infoM;
 	infoM.Format(_T("归并完成，共 %d 注3D码.如需查看频度，请导出文件。"),ec->dvCode.size());
+	m_REInfo.SetWindowTextW(infoM);
+}
+
+
+void CWelfareDlg::OnClickedAddtoaset()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int count = ec->copyCode(ec->dvCode,aSet);
+	CString infoM;
+	infoM.Format(_T("在A中存入 %d 注3D码."),count);
 	m_REInfo.SetWindowTextW(infoM);
 }

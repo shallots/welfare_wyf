@@ -622,6 +622,11 @@ void copydvCode(vector<CodeType> ct, vector<CodeType> &dv){
 	}
 }
 
+int Encode::copyCode(vector<CodeType> src, vector<CodeType> &dst){
+	copydvCode(src,dst);
+	return dst.size();
+}
+
 void genThree(vector<CodeType>::iterator it,vector<CodeType>& list){
 	//list.push_back(*it);
 	int code[2];
@@ -774,6 +779,33 @@ int Encode::merge(Encode *ec){
 	return dvCode.size();
 }
 
+// completeSet要是有序的集合
+void Encode::getSupplementarySet(vector<CodeType> completeSet){
+	if(completeSet.size() < 1){
+		return;
+	}
+	if(dvCode.size() < 1){
+		copydvCode(completeSet,dvCode);
+		return;
+	}
+	ordering();
+	// 直接做差
+	vector<CodeType> tmp;
+	for(vector<CodeType>::iterator ita = completeSet.begin(); ita != completeSet.end(); ita++){
+		bool xflag = false;
+		for(vector<CodeType>::iterator itb = dvCode.begin(); itb != dvCode.end(); itb++){
+			if(codeEqual(ita,itb,codetype)){
+				xflag = true;
+				break;
+			}
+		}
+		if(xflag){
+			continue;
+		}
+		tmp.push_back(*ita);
+	}
+	copydvCode(tmp,dvCode);
+}
 
 bool Encode::getIsInQueue(){
 	return isInQueue;

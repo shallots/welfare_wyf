@@ -42,6 +42,7 @@ private:
 public:
 	Encode *ec;
 	vector<Encode*> ecVector;
+	vector<CodeType> aSet;			// 集合A
 
 	BOOL forcastFlag; // 预测标志
 	CWinThread *pThread;
@@ -76,7 +77,7 @@ public:
 	CEdit m_arr2;
 	CEdit m_arr3;
 	CEdit m_boldCode;
-	CButton m_checkTip;
+//	CButton m_checkTip;
 	CButton m_export;
 	CButton m_forcast;
 	CEdit m_issue;
@@ -85,7 +86,7 @@ public:
 	CEdit m_plusTail;
 	CRichEditCtrl m_REInfo;
 	CButton m_reset;
-	CButton m_revocation;
+//	CButton m_revocation;
 	CEdit m_twoCode;
 	afx_msg void OnSetfocusIssue();
 	afx_msg void OnSetfocusArr1();
@@ -99,8 +100,8 @@ public:
 	afx_msg void OnBnClickedKillcode();
 	afx_msg void OnBnClickedExport();
 	afx_msg void OnBnClickedReset();
-	afx_msg void OnDblclkListcode();
-	afx_msg void OnBnClickedRevocation();
+//	afx_msg void OnDblclkListcode();
+//	afx_msg void OnBnClickedRevocation();
 	afx_msg void OnEnChangeTwocode();
 	CButton m_sift;
 	//CButton m_direct;
@@ -146,6 +147,9 @@ public:
 	CButton mGenType;
 	CButton outputCheck;
 	CEdit m_kuaDu;
+	CButton m_addToA;
+	afx_msg void OnClickedAddtoaset();
+	afx_msg void OnBnClickedAddtoaset2();
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);

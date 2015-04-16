@@ -34,9 +34,7 @@ public:
 	vector<CodeType> backup;
 	// 杀大和，杀两头，全大全小，全奇全偶
 	vector<CodeType> recycleBin;
-
 	// 杀码队列
-
 	Encode();
 	~Encode();
 
@@ -86,8 +84,13 @@ public:
 	// 归并多组编码
 	int merge(Encode *ec);
 
+	// 编码求反
+	void getSupplementarySet(vector<CodeType> competeSet);
+
 	void setInQueue(bool isInQueue);
 	bool getIsInQueue();
+
+	int copyCode(vector<CodeType> src, vector<CodeType> &dst);
 
 	// 销毁编码
 	void eraseCode();
