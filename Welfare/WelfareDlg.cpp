@@ -274,7 +274,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.04.16)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2015.05.27)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -843,6 +843,7 @@ void printVector(CSelection oSel,vector<CodeType> vec, CString mTitle){
 void CWelfareDlg::OnBnClickedExport()
 {
 	ec->getSupplementarySet(aSet);
+	aSet.clear();
 	int count = ec->dvCode.size();
 
 	oddCodeCount = count;
@@ -870,7 +871,7 @@ void CWelfareDlg::OnBnClickedExport()
 
 	CString spacestr = _T("      ");
 	CString separator = _T("\n-------------------------------");
-
+	m_listCode.ResetContent();
 	// 根据 ec->dvCode 组码
 	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it!=ec->dvCode.end(); it++){
 		CString tmp;
@@ -883,6 +884,7 @@ void CWelfareDlg::OnBnClickedExport()
 		}else{
 			nonpairCode.push_back(tmp);
 		}
+		m_listCode.AddString(tmp);
 	}
 
 	// 定义word操作变量
