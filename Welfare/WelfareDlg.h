@@ -150,6 +150,8 @@ public:
 	CButton m_addToA;
 	afx_msg void OnClickedAddtoaset();
 	afx_msg void OnBnClickedAddtoaset2();
+	CButton mHightFreq;
+	afx_msg void OnClickedKhighfreq();
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);

@@ -145,6 +145,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
 	DDX_Control(pDX, IDC_KUADU, m_kuaDu);
 	DDX_Control(pDX, IDC_ADDTOASET, m_addToA);
+	DDX_Control(pDX, IDC_KHighFreq, mHightFreq);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -191,6 +192,7 @@ ON_NOTIFY(NM_DBLCLK, IDC_FORCASTQUEUE, &CWelfareDlg::OnDblclkForcastqueue)
 ON_BN_CLICKED(IDC_CLEARALL, &CWelfareDlg::OnBnClickedClearall)
 ON_BN_CLICKED(IDC_COMPOSITESELECT, &CWelfareDlg::OnBnClickedCompositeselect)
 ON_BN_CLICKED(IDC_ADDTOASET, &CWelfareDlg::OnClickedAddtoaset)
+ON_BN_CLICKED(IDC_KHighFreq, &CWelfareDlg::OnClickedKhighfreq)
 END_MESSAGE_MAP()
 
 // CWelfareDlg 消息处理程序
@@ -274,7 +276,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2015.05.27)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2015.06.15)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -1567,4 +1569,29 @@ void CWelfareDlg::OnClickedAddtoaset()
 	CString infoM;
 	infoM.Format(_T("在A中存入 %d 注3D码."),count);
 	m_REInfo.SetWindowTextW(infoM);
+}
+
+void CWelfareDlg::OnClickedKhighfreq()
+{
+	// 高频杀码
+	if(!forcastFlag){
+		MessageBoxW(_T("请先进行预测，再进行高频杀码."));
+		return;
+	}
+	// 杀码
+	int ori = ec->dvCode.size();
+	int count = ec->killCodeByHFC();
+
+	CString infoM;
+	infoM.Format(_T("高频杀码 %d 注3D码."), ori - count);
+	m_REInfo.SetWindowTextW(infoM);
+
+	// 打印到右边
+	m_listCode.ResetContent();
+	for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); it++)
+	{
+		CString tmp;
+		tmp.Format(_T("%d%d%d-%d"),it->codeSeq[0],it->codeSeq[1],it->codeSeq[2],it->mantissa);
+		m_listCode.AddString(tmp);
+	}
 }

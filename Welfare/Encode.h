@@ -12,8 +12,8 @@ typedef struct
 {
 	int codeSeq[3];
 	unsigned int mantissa;
-	int frequency;
-	int span;
+	int frequency;			// 频度
+	int span;				// 跨度
 }CodeType;
 
 typedef struct
@@ -29,6 +29,7 @@ private:
 	bool isInQueue;				// 是否被添加到队列
 	bool isMerge;
 	int codetype;
+	vector<CodeType> highFreqCode;
 public:
 	vector<CodeType> dvCode;
 	vector<CodeType> backup;
@@ -91,6 +92,9 @@ public:
 	bool getIsInQueue();
 
 	int copyCode(vector<CodeType> src, vector<CodeType> &dst);
+
+	// 高频杀码,返回剩余码数
+	int killCodeByHFC();
 
 	// 销毁编码
 	void eraseCode();

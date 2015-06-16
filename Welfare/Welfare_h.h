@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0555 */
-/* at Thu Apr 16 14:29:47 2015
+/* at Mon Jun 15 15:46:01 2015
  */
 /* Compiler settings for Welfare.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
