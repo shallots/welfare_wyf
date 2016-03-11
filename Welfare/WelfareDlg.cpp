@@ -272,7 +272,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.12.05)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.03.11)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -866,7 +866,8 @@ void CWelfareDlg::OnBnClickedExport()
 	vector<CString> nonpairCode;
 
 	CString spacestr = _T("      ");
-	CString separator = _T("\n-------------------------------");
+	CString separator = _T("\n++++++++++++++++++++++++++++++++");
+	CString shortSeparator = _T("\n---------------");
 
 	// 根据 ec->dvCode 组码
 	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it!=ec->dvCode.end(); it++){
@@ -946,10 +947,22 @@ void CWelfareDlg::OnBnClickedExport()
 		flagExport = true;
 	}
 
+	bool segFlag = false;
+
 	// 导出对子
 	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
 	{
 		CString tmp = *it;
+
+		if(!segFlag && tmp[0] == '5'){
+			segFlag = true;
+			font.put_Size( 12 );
+			str.Format(_T(" \n\n※ 对子(大于500) "));
+			oSel.TypeText(str);
+			oSel.TypeText(shortSeparator);
+			font.put_Size( 14 );
+			oSel.TypeParagraph();
+		}
 		oSel.TypeText(tmp);
 		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
 		font.put_Size( 10 );
@@ -957,6 +970,7 @@ void CWelfareDlg::OnBnClickedExport()
 		font.put_Size( 14 );
 		oSel.TypeText(spacestr);
 	}
+	
 	// 导出少数派对子
 	if(flagExport){
 		CString mTitle;
@@ -970,10 +984,21 @@ void CWelfareDlg::OnBnClickedExport()
 	font.put_Size( 14 );
 	oSel.TypeParagraph();
 
-	// 导出对子
+	segFlag = false;
+	// 导出非对子
 	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++)
 	{
 		CString tmp = *it;
+		if(!segFlag && tmp[0] == '5'){
+			segFlag = true;
+			font.put_Size( 12 );
+			str.Format(_T(" \n\n※ 非对子(大于500)"));
+			oSel.TypeText(str);
+			oSel.TypeText(shortSeparator);
+			font.put_Size( 14 );
+			oSel.TypeParagraph();
+		}
+
 		oSel.TypeText(tmp);
 		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
 		font.put_Size( 10 );
@@ -983,6 +1008,7 @@ void CWelfareDlg::OnBnClickedExport()
 	}
 	pairCode.clear();
 	nonpairCode.clear();
+	segFlag = false;
 
 	// 导出少数派非对子
 	if(flagExport){

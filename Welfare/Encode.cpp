@@ -296,7 +296,7 @@ int Encode::ordering()
 {
 	if(!codeFlag)
 		return 0;
-	sort(dvCode.begin(),dvCode.end(),comp);
+	sort(dvCode.begin(),dvCode.end(),comp2);
 	return 1;
 }
 
