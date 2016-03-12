@@ -272,7 +272,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.03.11)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.03.12)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -519,7 +519,7 @@ void CWelfareDlg::OnBnClickedForcast()
 		ec->groupChoose();
 
 		// 和值尾有序化
-		ec->ordering();
+		ec->orderingByMant();
 
 		// 输出到右边列表中
 		for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); it++)
@@ -866,10 +866,11 @@ void CWelfareDlg::OnBnClickedExport()
 	vector<CString> nonpairCode;
 
 	CString spacestr = _T("      ");
-	CString separator = _T("\n++++++++++++++++++++++++++++++++");
+	CString separator = _T("\n------------------------------");
 	CString shortSeparator = _T("\n---------------");
 
 	// 根据 ec->dvCode 组码
+	//ec->classify();
 	for(vector<CodeType>::iterator it = ec->dvCode.begin(); it!=ec->dvCode.end(); it++){
 		CString tmp;
 		if(ec->getIsMerge())
@@ -930,10 +931,14 @@ void CWelfareDlg::OnBnClickedExport()
 	oSel.TypeParagraph();
 	font.put_Size(14);
 
-	font.put_Size( 12 );
+	font.put_Name(_T("黑体"));
 	str.Format(_T("※ 对子: %d 注 "),pairCode.size());
 	oSel.TypeText(str);
-	oSel.TypeText(separator);
+	font.put_Size( 10 );
+	font.put_Name(_T("宋体"));
+	if(ec->getCodeType() == GROUP){
+		oSel.TypeText(separator);
+	}
 	font.put_Size( 14 );
 	oSel.TypeParagraph();
 	
@@ -948,20 +953,38 @@ void CWelfareDlg::OnBnClickedExport()
 	}
 
 	bool segFlag = false;
-
+	bool headDesc = true;
+	int low500Count = 0;
+	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++){
+		CString tmp = *it;
+		if(tmp[0] < '5')
+			low500Count ++;
+		else
+			break;
+	}
 	// 导出对子
 	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++)
 	{
 		CString tmp = *it;
-
-		if(!segFlag && tmp[0] == '5'){
-			segFlag = true;
-			font.put_Size( 12 );
-			str.Format(_T(" \n\n※ 对子(大于500) "));
-			oSel.TypeText(str);
-			oSel.TypeText(shortSeparator);
-			font.put_Size( 14 );
-			oSel.TypeParagraph();
+		if(ec->getCodeType() == DIRECT){
+			if(headDesc){
+				headDesc = false;
+				font.put_Size( 12 );
+				str.Format(_T(" △小于500者: %d 注"),low500Count);
+				oSel.TypeText(str);
+				oSel.TypeText(shortSeparator);
+				font.put_Size( 14 );
+				oSel.TypeParagraph();
+			}
+			if(!segFlag && tmp[0] >= '5'){
+				segFlag = true;
+				font.put_Size( 12 );
+				str.Format(_T(" \n\n△大于500者: %d 注"),pairCode.size() - low500Count);
+				oSel.TypeText(str);
+				oSel.TypeText(shortSeparator);
+				font.put_Size( 14 );
+				oSel.TypeParagraph();
+			}
 		}
 		oSel.TypeText(tmp);
 		oSel.MoveLeft(COleVariant((short)2),COleVariant((short)1),COleVariant((short)1));
@@ -977,26 +1000,52 @@ void CWelfareDlg::OnBnClickedExport()
 		mTitle.Format(_T("少数派·对子[ %d ]注"),vp.size());
 		printVector(oSel,vp,mTitle);
 	}
-	font.put_Size( 12 );
+	font.put_Name(_T("黑体"));
+	font.put_Size( 14 );
 	str.Format(_T(" \n\n※ 非对子: %d 注 "),nonpairCode.size());
 	oSel.TypeText(str);
-	oSel.TypeText(separator);
+	font.put_Size( 10 );
+	font.put_Name(_T("宋体"));
+	if(ec->getCodeType() == GROUP){
+		oSel.TypeText(separator);
+	}
 	font.put_Size( 14 );
 	oSel.TypeParagraph();
 
 	segFlag = false;
+	low500Count = 0;
+	headDesc = true;
+
+	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++){
+		CString tmp = *it;
+		if(tmp[0] < '5')
+			low500Count ++;
+		else
+			break;
+	}
 	// 导出非对子
 	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++)
 	{
 		CString tmp = *it;
-		if(!segFlag && tmp[0] == '5'){
-			segFlag = true;
-			font.put_Size( 12 );
-			str.Format(_T(" \n\n※ 非对子(大于500)"));
-			oSel.TypeText(str);
-			oSel.TypeText(shortSeparator);
-			font.put_Size( 14 );
-			oSel.TypeParagraph();
+		if(ec->getCodeType() == DIRECT){
+			if(headDesc){
+				headDesc = false;
+				font.put_Size( 12 );
+				str.Format(_T("△小于500者: %d 注"),low500Count);
+				oSel.TypeText(str);
+				oSel.TypeText(shortSeparator);
+				font.put_Size( 14 );
+				oSel.TypeParagraph();
+			}
+			if(!segFlag && tmp[0] >= '5'){
+				segFlag = true;
+				font.put_Size( 12 );
+				str.Format(_T(" \n\n△大于500者: %d 注"),nonpairCode.size() - low500Count);
+				oSel.TypeText(str);
+				oSel.TypeText(shortSeparator);
+				font.put_Size( 14 );
+				oSel.TypeParagraph();
+			}
 		}
 
 		oSel.TypeText(tmp);
@@ -1009,7 +1058,7 @@ void CWelfareDlg::OnBnClickedExport()
 	pairCode.clear();
 	nonpairCode.clear();
 	segFlag = false;
-
+	low500Count = 0;
 	// 导出少数派非对子
 	if(flagExport){
 		CString mTitle;
@@ -1402,6 +1451,7 @@ void CWelfareDlg::OnClickedDecheck()
 	// TODO: 在此添加控件通知处理程序代码
 	if(forcastFlag && m_deCheck.GetCheck()){
 		ec->grouptodirect();
+		ec->ordering();
 
 		m_listCode.ResetContent();
 		for(vector<CodeType>::iterator it = ec->dvCode.begin(); it != ec->dvCode.end(); )

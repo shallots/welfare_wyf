@@ -300,6 +300,14 @@ int Encode::ordering()
 	return 1;
 }
 
+int Encode::orderingByMant()
+{
+	if(!codeFlag)
+		return 0;
+	sort(dvCode.begin(),dvCode.end(),comp);
+	return 1;
+}
+
 int Encode::orderForRecycleBin(){
 	if(!codeFlag)
 		return 0;
@@ -718,6 +726,25 @@ int Encode::setCodeType(int ct){
 		return -1;
 	}
 }
+
+int Encode::classify(){
+	if(!codeFlag || dvCode.size()<1)
+		return -1;
+	pair.clear();
+	nonpair.clear();
+
+	for(vector<CodeType>::iterator it = dvCode.begin(); it!=dvCode.end(); it++){
+		if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1] == it->codeSeq[2]
+		|| it->codeSeq[1] == it->codeSeq[2]){
+			pair.push_back(*it);
+		}else{
+			nonpair.push_back(*it);
+		}
+	}
+	return dvCode.size();
+}
+
+
 void Encode::eraseCode()
 {
 	if(!codeFlag)

@@ -29,9 +29,12 @@ private:
 	bool isInQueue;				// 是否被添加到队列
 	bool isMerge;
 	int codetype;
+
 public:
 	vector<CodeType> dvCode;
 	vector<CodeType> backup;
+	vector<CodeType> pair;
+	vector<CodeType> nonpair;
 	// 杀大和，杀两头，全大全小，全奇全偶
 	vector<CodeType> recycleBin;
 
@@ -54,6 +57,9 @@ public:
 	int grouptodirect();
 	// 编码排序,返回编码个数
 	int ordering();
+	// 编码排序,返回编码个数
+	int orderingByMant();
+
 	int orderForRecycleBin();
 	// 按频度排序
 	int orderByFreq();
@@ -88,6 +94,10 @@ public:
 
 	void setInQueue(bool isInQueue);
 	bool getIsInQueue();
+
+		// 对子与非对子分类
+	int classify();
+
 
 	// 销毁编码
 	void eraseCode();
