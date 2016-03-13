@@ -794,7 +794,9 @@ int Encode::merge(Encode *ec){
 			dvCode.push_back(*it);
 	}
 	// 按频度排序
-	orderByFreq();
+	//orderByFreq();
+	//按大小排序
+	ordering();
 	// 设置标志
 	setIsMerge(true);
 	codeFlag = true;

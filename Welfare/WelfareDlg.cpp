@@ -272,7 +272,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.03.12)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.03.13)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -868,6 +868,7 @@ void CWelfareDlg::OnBnClickedExport()
 	CString spacestr = _T("      ");
 	CString separator = _T("\n------------------------------");
 	CString shortSeparator = _T("\n---------------");
+	int stdIndex = ec->getIsMerge()?3:0;
 
 	// 根据 ec->dvCode 组码
 	//ec->classify();
@@ -957,7 +958,7 @@ void CWelfareDlg::OnBnClickedExport()
 	int low500Count = 0;
 	for(vector<CString>::iterator it = pairCode.begin(); it != pairCode.end(); it++){
 		CString tmp = *it;
-		if(tmp[0] < '5')
+		if(tmp[stdIndex] < '5')
 			low500Count ++;
 		else
 			break;
@@ -976,7 +977,7 @@ void CWelfareDlg::OnBnClickedExport()
 				font.put_Size( 14 );
 				oSel.TypeParagraph();
 			}
-			if(!segFlag && tmp[0] >= '5'){
+			if(!segFlag && tmp[stdIndex] >= '5'){
 				segFlag = true;
 				font.put_Size( 12 );
 				str.Format(_T(" \n\n△大于500者: %d 注"),pairCode.size() - low500Count);
@@ -1018,7 +1019,7 @@ void CWelfareDlg::OnBnClickedExport()
 
 	for(vector<CString>::iterator it = nonpairCode.begin(); it != nonpairCode.end(); it++){
 		CString tmp = *it;
-		if(tmp[0] < '5')
+		if(tmp[stdIndex] < '5')
 			low500Count ++;
 		else
 			break;
@@ -1037,7 +1038,7 @@ void CWelfareDlg::OnBnClickedExport()
 				font.put_Size( 14 );
 				oSel.TypeParagraph();
 			}
-			if(!segFlag && tmp[0] >= '5'){
+			if(!segFlag && tmp[stdIndex] >= '5'){
 				segFlag = true;
 				font.put_Size( 12 );
 				str.Format(_T(" \n\n△大于500者: %d 注"),nonpairCode.size() - low500Count);
@@ -1078,8 +1079,10 @@ void CWelfareDlg::OnBnClickedExport()
 
 void CWelfareDlg::OnBnClickedReset()
 {
-	if(!ec->getIsInQueue())
+	if(!ec->getIsInQueue()){
 		ec->eraseCode();
+		queueNum = 0;
+	}
 	m_listCode.ResetContent();
 
 	while(!recoverCodeStack.empty())
@@ -1089,8 +1092,7 @@ void CWelfareDlg::OnBnClickedReset()
 	totalCodeCount = 0;
 	killCodeCount = 0;
 	oddCodeCount = 0;
-	queueNum = 0;
-	m_issue.SetWindowTextW(_T(""));
+	//m_issue.SetWindowTextW(_T(""));
 	m_arr1.SetWindowTextW(_T(""));
 	m_arr2.SetWindowTextW(_T(""));
 	m_arr3.SetWindowTextW(_T(""));
@@ -1522,6 +1524,10 @@ void CWelfareDlg::OnBnClickedAddqueue()
 	// 将当前预测加入到预测队列
 	if(ec->getIsInQueue())
 		return;
+	if(ecVector.size()>0 && ecVector[0]->getCodeType() != ec->getCodeType()){
+		MessageBox(_T("组码类型不一致，无法加入到队列？"),_T("提示"),MB_OK);
+		return;
+	}
 	ecVector.push_back(ec);
 	ec->setInQueue(true);
 	queueNum ++;
@@ -1576,6 +1582,8 @@ void CWelfareDlg::OnBnClickedClearall()
 	// TODO: 在此添加控件通知处理程序代码
 	OnBnClickedReset();
 	ecVector.clear();
+	queueNum = 0;
+	m_issue.SetWindowTextW(_T(""));
 	//if(ecVector.empty()){
 	//	MessageBoxW(_T("预测队列已经清空"));
 	//}
