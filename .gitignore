@@ -31,6 +31,7 @@
 *.sdf
 *.ipch
 *.opensdf
+*.aps
 
 # dir
 Release
