@@ -65,7 +65,11 @@ public:
 	int AdjustFreqByMantissa(vector<int>);
 
 	// 杀码，返回杀码个数
-	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
+	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
+
+	// 跨度选码
+	int selectBasedSpan(vector<int> span);
+
 	// 筛选和值
 	int siftPlus(int min, int max);
 
@@ -88,8 +92,13 @@ public:
 	// 归并多组编码
 	int merge(Encode *ec);
 
+	// 编码求反
+	void getSupplementarySet(vector<CodeType> competeSet);
+
 	void setInQueue(bool isInQueue);
 	bool getIsInQueue();
+
+	int copyCode(vector<CodeType> src, vector<CodeType> &dst);
 
 	// 销毁编码
 	void eraseCode();

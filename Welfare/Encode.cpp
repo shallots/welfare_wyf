@@ -397,12 +397,47 @@ int Encode::orderByFreq(){
 }
 
 /***********************************************
+*	名称：跨度选码
+*	功能：计算3D码的跨度，并筛选
+*	作者：Hyw
+*	日期：05/12/14
+************************************************/
+int Encode::selectBasedSpan(vector<int> span){
+	if(span.size()<1 || dvCode.size()<1)
+		return 0;
+	int count = 0;
+	for(vector<CodeType>::iterator it = dvCode.begin(); it!=dvCode.end(); ){
+		int max;
+		int min;
+		max = it->codeSeq[0]>it->codeSeq[1]?it->codeSeq[0]:it->codeSeq[1];
+		max = max>it->codeSeq[2]?max:it->codeSeq[2];
+		min = it->codeSeq[0]<it->codeSeq[1]?it->codeSeq[0]:it->codeSeq[1];
+		min = min<it->codeSeq[2]?min:it->codeSeq[2];
+		int eSpan = max - min;
+		bool flag = false;
+		for(vector<int>::iterator ita = span.begin(); ita!=span.end(); ita++){
+			if(eSpan == *ita){
+				flag = true;
+				break;
+			}
+		}
+		if(!flag){
+			it = dvCode.erase(it);
+			count++;
+		}else{
+			it++;
+		}
+	}
+	return count;
+}
+
+/***********************************************
 *	名称：基础杀码函数
 *	功能：和值尾，胆码，百，十，个，二码等
 *	作者：Hyw
 *	日期：13/05/13
 ************************************************/
-int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
+int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
 {
 	if(!codeFlag)
 	{
@@ -411,6 +446,7 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 	int count = 0;
 
 	// 杀码有序化
+	sort(plustail.begin(),plustail.end());
 	sort(boldcode.begin(),boldcode.end());
 	sort(hdr.begin(),hdr.end());
 	sort(decade.begin(),decade.end());
@@ -420,7 +456,18 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
 	{
 		bool flag = false;
-		if(boldcode.size()) 
+		
+		for(vector<int>::iterator it = plustail.begin(); it != plustail.end(); it++)
+		{
+			if(itcode->mantissa == *it)
+			{
+				flag = true;
+				break;
+			}else if((int)itcode->mantissa < *it)
+				break;
+		}
+
+		if(flag || (!plustail.size() && boldcode.size())) 
 		{
 			for(vector<int>::iterator it = boldcode.begin(); it != boldcode.end(); it++)
 			{
@@ -430,19 +477,21 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 				{
 					flag = true;
 					break;
+				}else{
+					flag = false;
 				}
 			}
 		}
 
 		// 胆码判定成功才能进入八卦二码杀码
-		if(flag || (!boldcode.size() && gossip.size()))
+		if(flag || (!plustail.size() && !boldcode.size() && gossip.size()))
 		{
 			for(vector<Gossip>::iterator it=gossip.begin(); it != gossip.end(); it++)
 			{
 				if((itcode->codeSeq[0] == it->x ||
 					itcode->codeSeq[1] == it->x ||
 					itcode->codeSeq[2] == it->x) &&
-					(itcode->codeSeq[0] == it->y ||
+				   (itcode->codeSeq[0] == it->y ||
 					itcode->codeSeq[1] == it->y ||
 					itcode->codeSeq[2] == it->y))
 				{
@@ -455,7 +504,7 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 			}
 		}
 
-		if(flag || (!boldcode.size() && !gossip.size() &&hdr.size()))
+		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() &&hdr.size()))
 		{
 			for(vector<int>::iterator it=hdr.begin(); it!=hdr.end(); it++)
 			{
@@ -468,7 +517,7 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 				}
 			}
 		}
-		if(flag || (!boldcode.size() && !gossip.size() && !hdr.size() &&decade.size()))
+		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() && !hdr.size() &&decade.size()))
 		{
 			for(vector<int>::iterator it=decade.begin(); it!=decade.end(); it++)
 			{
@@ -481,7 +530,7 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 				}
 			}
 		}
-		if(flag || (!boldcode.size() && !gossip.size() && !hdr.size() && !decade.size() &&unit.size()))
+		if(flag || (!plustail.size() && !boldcode.size() && !gossip.size() && !hdr.size() && !decade.size() &&unit.size()))
 		{
 			for(vector<int>::iterator it=unit.begin(); it!=unit.end(); it++)
 			{
@@ -494,6 +543,7 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 				}
 			}
 		}
+		
 		if(!flag)
 		{
 			itcode = dvCode.erase(itcode);
@@ -502,6 +552,7 @@ int Encode::killCode(vector<int> boldcode,vector<int> hdr,vector<int> decade,vec
 			itcode ++;
 		}
 	}
+
 	return count;
 }
 
@@ -652,6 +703,11 @@ void copydvCode(vector<CodeType> ct, vector<CodeType> &dv){
 	for(vector<CodeType>::iterator it=ct.begin(); it!=ct.end(); it++){
 		dv.push_back(*it);
 	}
+}
+
+int Encode::copyCode(vector<CodeType> src, vector<CodeType> &dst){
+	copydvCode(src,dst);
+	return dst.size();
 }
 
 void genThree(vector<CodeType>::iterator it,vector<CodeType>& list){
@@ -805,6 +861,34 @@ int Encode::merge(Encode *ec){
 	return dvCode.size();
 }
 
+
+// completeSet要是有序的集合
+void Encode::getSupplementarySet(vector<CodeType> completeSet){
+	if(completeSet.size() < 1){
+		return;
+	}
+	if(dvCode.size() < 1){
+		copydvCode(completeSet,dvCode);
+		return;
+	}
+	ordering();
+	// 直接做差
+	vector<CodeType> tmp;
+	for(vector<CodeType>::iterator ita = completeSet.begin(); ita != completeSet.end(); ita++){
+		bool xflag = false;
+		for(vector<CodeType>::iterator itb = dvCode.begin(); itb != dvCode.end(); itb++){
+			if(codeEqual(ita,itb,codetype)){
+				xflag = true;
+				break;
+			}
+		}
+		if(xflag){
+			continue;
+		}
+		tmp.push_back(*ita);
+	}
+	copydvCode(tmp,dvCode);
+}
 
 bool Encode::getIsInQueue(){
 	return isInQueue;

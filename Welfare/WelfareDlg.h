@@ -42,6 +42,7 @@ private:
 public:
 	Encode *ec;
 	vector<Encode*> ecVector;
+	vector<CodeType> aSet;			// 集合A
 
 	BOOL forcastFlag; // 预测标志
 	CWinThread *pThread;
@@ -80,7 +81,7 @@ public:
 //	CEdit m_arr2;
 //	CEdit m_arr3;
 	CEdit m_boldCode;
-	CButton m_checkTip;
+//	CButton m_checkTip;
 	CButton m_export;
 	CButton m_forcast;
 	CEdit m_issue;
@@ -89,7 +90,7 @@ public:
 	CEdit m_plusTail;
 	CRichEditCtrl m_REInfo;
 	CButton m_reset;
-	CButton m_revocation;
+//	CButton m_revocation;
 	CEdit m_twoCode;
 	afx_msg void OnSetfocusIssue();
 	afx_msg void OnSetfocusArr1();
@@ -103,8 +104,8 @@ public:
 	afx_msg void OnBnClickedKillcode();
 	afx_msg void OnBnClickedExport();
 	afx_msg void OnBnClickedReset();
-	afx_msg void OnDblclkListcode();
-	afx_msg void OnBnClickedRevocation();
+//	afx_msg void OnDblclkListcode();
+//	afx_msg void OnBnClickedRevocation();
 	afx_msg void OnEnChangeTwocode();
 	CButton m_sift;
 	//CButton m_direct;
@@ -155,6 +156,15 @@ public:
 	CButton m_updateFreq2;
 	afx_msg void OnBnClickedUpdatefreq1();
 	afx_msg void OnBnClickedUpdatefreq2();
+//	CButton m_addToA;
+	CEdit m_plusTail4Kill;
+	CStatic m_infoA;
+//	afx_msg void OnClickedAddtoaset();
+	CButton m_aminusb;
+	afx_msg void OnClickedAminusB();
+	CEdit m_kuaDu;
+//	afx_msg void OnBnClickedAdd2a();
+	afx_msg void OnBnClickedSetasa();
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);
