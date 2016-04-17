@@ -71,6 +71,101 @@ int Encode::encodingTwo(vector<int> da, vector<int> db, vector<int> dc)
 	return dvCode.size();
 }
 
+int Encode::encodingTwoCombination(vector<int>** data, int count){
+	int i=0;
+	int j=0;
+	int flag[100] = {0};
+
+	for(i=0; i<count-1; i++)
+	{
+		for(j=i+1; j<count; j++)
+		{
+			for(vector<int>::iterator ita = data[i]->begin(); ita != data[i]->end(); ita++)
+			{
+				for(vector<int>::iterator itc = data[j]->begin(); itc != data[j]->end(); itc++)
+				{
+					int max = *ita;
+					int min = *itc;
+					if(max<min){
+						int tmp = max;
+						max = min;
+						min = tmp;
+					}
+					int index = min*10 + max;
+					if(flag[index]) continue;
+					CodeType tmp;
+					tmp.codeSeq[0] = min;
+					tmp.codeSeq[1] = max;
+					tmp.frequency = 1;
+					dvCode.push_back(tmp);
+					flag[index] = 1;
+				}
+			}
+		}
+	}
+	codeFlag = true;
+	return dvCode.size();
+}
+
+/*********************************************************
+*	名称：三向量二码法编码函数
+*	功能：使用三组整数向量进行编码
+*	参数：
+*		da,第一组整数向量；db，第二组整数向量；dc，第三组整数向量
+*	作者:Hyw
+*	日期:16/04/17
+*   注释: 二码法，两两组合
+*********************************************************/
+int Encode::encodingTwoCombination(vector<int> da, vector<int> db, vector<int> dc)
+{
+	//  暂未写异常处理
+	if(codeFlag)
+	{
+		return 0;
+	}
+	if(!(da.size() && db.size() && dc.size()))
+	{
+		return -1;
+	}
+
+	// 直选编码
+	vector<int> *data[3];
+	data[0] = &da;
+	data[1] = &db;
+	data[2] = &dc;
+	return encodingTwoCombination(data,3);
+}
+/*********************************************************
+*	名称：四向量二码法编码函数
+*	功能：使用四组整数向量进行编码
+*	参数：
+*		da,第一组整数向量；db，第二组整数向量；dc，第三组整数向量；dd，第四组整数向量
+*	作者:Hyw
+*	日期:16/04/17
+*   注释: 二码法，两两组合
+*********************************************************/
+
+int Encode::encodingTwoCombination(vector<int> da, vector<int> db, vector<int> dc, vector<int> dd)
+{
+	//  暂未写异常处理
+	if(codeFlag)
+	{
+		return 0;
+	}
+	if(!(da.size() && db.size() && dc.size()))
+	{
+		return -1;
+	}
+
+	// 直选编码
+	vector<int> *data[4];
+	data[0] = &da;
+	data[1] = &db;
+	data[2] = &dc;
+	data[3] = &dd;
+	return encodingTwoCombination(data,4);
+}
+
 /*********************************************************
 *	名称：三向量编码函数
 *	功能：使用三组整数向量进行编码
@@ -283,9 +378,22 @@ bool comp2(const CodeType &a, const CodeType &b)
 		return a.codeSeq[0] < b.codeSeq[0];
 }
 
-bool compWithFreq(const CodeType &a, const CodeType &b){
+bool compByVal(const CodeType &a,const CodeType &b)
+{
+	if (a.codeSeq[0] == b.codeSeq[0])
+	{
+		if (a.codeSeq[1] == b.codeSeq[1])
+		{
+			return a.codeSeq[2] < b.codeSeq[2];
+		}else
+			return a.codeSeq[1] < b.codeSeq[1];
+	}else
+		return a.codeSeq[0] < b.codeSeq[0];
+}
+
+bool compByFreq(const CodeType &a, const CodeType &b){
 	if(a.frequency == b.frequency){
-		return comp(a,b);
+		return compByVal(a,b);
 	}else{
 		return a.frequency > b.frequency;
 	}
@@ -303,14 +411,21 @@ int Encode::ordering()
 int Encode::orderForRecycleBin(){
 	if(!codeFlag)
 		return 0;
-	sort(recycleBin.begin(),recycleBin.end(),compWithFreq);
+	sort(recycleBin.begin(),recycleBin.end(),compByFreq);
+	return 1;
+}
+
+int Encode::orderByVal(){
+	if(!codeFlag)
+		return 0;
+	sort(dvCode.begin(),dvCode.end(),compByVal);
 	return 1;
 }
 
 int Encode::orderByFreq(){
 	if(!codeFlag)
 		return 0;
-	sort(dvCode.begin(),dvCode.end(),compWithFreq);
+	sort(dvCode.begin(),dvCode.end(),compByFreq);
 	return 1;
 }
 /***********************************************
@@ -354,6 +469,66 @@ int Encode::selectBasedSpan(vector<int> span){
 *	作者：Hyw
 *	日期：13/05/13
 ************************************************/
+int Encode::killCode(vector<int> boldcode,vector<Gossip> gossip)
+{
+	if(!codeFlag)
+	{
+		return 0;
+	}
+	int count = 0;
+	sort(boldcode.begin(),boldcode.end());
+		//  杀码,算法有待优化
+	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
+	{
+		bool flag = false;
+		for(vector<int>::iterator it = boldcode.begin(); it != boldcode.end(); it++)
+		{
+			if(itcode->codeSeq[0] == *it ||
+				itcode->codeSeq[1] == *it)
+			{
+				flag = true;
+				break;
+			}else{
+				flag = false;
+			}
+		}
+				// 胆码判定成功才能进入八卦二码杀码
+		if(flag || (!boldcode.size() && gossip.size()))
+		{
+			for(vector<Gossip>::iterator it=gossip.begin(); it != gossip.end(); it++)
+			{
+				if((itcode->codeSeq[0] == it->x ||
+					itcode->codeSeq[1] == it->x ) &&
+					(itcode->codeSeq[0] == it->y ||
+					itcode->codeSeq[1] == it->y))
+				{
+					flag = true;
+					break;
+				}
+				else{
+					flag = false;
+				}
+			}
+		}
+		
+		if(!flag)
+		{
+			itcode = dvCode.erase(itcode);
+			count ++;
+		}else{
+			itcode ++;
+		}
+	}
+
+	return count;
+}
+
+/***********************************************
+*	名称：基础杀码函数
+*	功能：和值尾，胆码，百，十，个，二码等
+*	作者：Hyw
+*	日期：13/05/13
+************************************************/
 int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
 {
 	if(!codeFlag)
@@ -373,7 +548,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
 	{
 		bool flag = false;
-		
+
 		for(vector<int>::iterator it = plustail.begin(); it != plustail.end(); it++)
 		{
 			if(itcode->mantissa == *it)
@@ -408,7 +583,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 				if((itcode->codeSeq[0] == it->x ||
 					itcode->codeSeq[1] == it->x ||
 					itcode->codeSeq[2] == it->x) &&
-				   (itcode->codeSeq[0] == it->y ||
+					(itcode->codeSeq[0] == it->y ||
 					itcode->codeSeq[1] == it->y ||
 					itcode->codeSeq[2] == it->y))
 				{
@@ -460,7 +635,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 				}
 			}
 		}
-		
+
 		if(!flag)
 		{
 			itcode = dvCode.erase(itcode);
@@ -677,7 +852,7 @@ int Encode::grouptodirect(){
 
 	for(vector<CodeType>::iterator it=dvCode.begin(); it!=dvCode.end(); it++){
 		if(it->codeSeq[0] == it->codeSeq[1] || it->codeSeq[1]==it->codeSeq[2]
-			||it->codeSeq[0] == it->codeSeq[2]){
+		||it->codeSeq[0] == it->codeSeq[2]){
 			genThree(it,dCode);
 		}else{
 			genSix(it,dCode);
@@ -733,11 +908,15 @@ void Encode::eraseCode()
 bool codeEqual(const vector<CodeType>::iterator a,const vector<CodeType>::iterator b, int flag){
 	if(flag == DIRECT){
 		return a->codeSeq[0] == b->codeSeq[0] && 
-				a->codeSeq[1] == b->codeSeq[1] && a->codeSeq[2] == b->codeSeq[2];
+			a->codeSeq[1] == b->codeSeq[1] && a->codeSeq[2] == b->codeSeq[2];
 	}else{
 		return a->mantissa == b->mantissa &&
-				getMax(a) == getMax(b) && getMin(a) == getMin(b);
+			getMax(a) == getMax(b) && getMin(a) == getMin(b);
 	}
+}
+
+bool code2Equal(const vector<CodeType>::iterator a,const vector<CodeType>::iterator b){
+	return b->codeSeq[0] == a->codeSeq[0] && a->codeSeq[1] == b->codeSeq[1];
 }
 
 // 归并其他Encode对象，计算dvCode频度
@@ -756,7 +935,7 @@ int Encode::merge(Encode *ec){
 		int pushFlag = true;
 		int i = 0;
 		for(vector<CodeType>::iterator ita = dvCode.begin(); ita != dvCode.end() && i<size; ita++){
-			if(codeEqual(it,ita,codetype)){
+			if(code2Equal(it,ita)){
 				ita->frequency += it->frequency;
 				pushFlag = false;
 				break;

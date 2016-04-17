@@ -13,7 +13,7 @@ typedef struct
 	int codeSeq[3];
 	unsigned int mantissa;
 	int frequency;
-	int span;
+	int span;					// 跨度
 }CodeType;
 
 typedef struct
@@ -46,6 +46,12 @@ public:
 	int encoding(vector<int>, vector<int>, vector<int>,bool);
 	// 4向量编码函数，成功，返回编码个数
 	int encoding(vector<int>, vector<int>, vector<int>, vector<int>,bool);
+	
+	// 二码组合
+	int encodingTwoCombination(vector<int>**,int);
+	int encodingTwoCombination(vector<int>, vector<int>, vector<int>);
+	int encodingTwoCombination(vector<int>, vector<int>, vector<int>, vector<int>);
+
 	// 去重
 	int de_weight();
 	// 组选函数
@@ -58,8 +64,14 @@ public:
 	// 按频度排序
 	int orderByFreq();
 
+	// 按值大小排序
+	int orderByVal();
+
 	// 杀码，返回杀码个数
 	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
+
+		// 杀码，返回杀码个数
+	int killCode(vector<int>,vector<Gossip>);
 	
 	// 跨度选码
 	int selectBasedSpan(vector<int> span);
