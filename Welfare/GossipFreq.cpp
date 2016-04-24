@@ -55,7 +55,7 @@ vector<GossipType>* GossipFreq::genGossipFreqCode()
 				GossipType tt = *it;
 				if(tt.gossip.compare(dict[i][j])==0)
 				{
-					tt.freq += tmpNum[i];
+					it->freq += tmpNum[i];
 					flag = false;
 					break; 
 				}
