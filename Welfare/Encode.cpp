@@ -677,8 +677,8 @@ bool isInSeq(vector<CodeType>::iterator it, int* ptr){
 			flag++;
 		if(ptr[i] == it->codeSeq[1])
 			flag++;
-		if(ptr[i] == it->codeSeq[2])
-			flag++;
+		//if(ptr[i] == it->codeSeq[2])
+		//	flag++;
 		i++;
 	}
 	if(flag >1)
