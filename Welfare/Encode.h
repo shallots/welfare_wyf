@@ -71,7 +71,7 @@ public:
 	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
 
 		// 杀码，返回杀码个数
-	int killCode(vector<int>,vector<Gossip>);
+	int killCode(vector<int>);
 	
 	// 跨度选码
 	int selectBasedSpan(vector<int> span);

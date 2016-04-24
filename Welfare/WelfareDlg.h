@@ -86,14 +86,14 @@ public:
 	CRichEditCtrl m_REInfo;
 	CButton m_reset;
 	CButton m_revocation;
-	CEdit m_twoCode;
+//	CEdit m_twoCode;
 	afx_msg void OnSetfocusIssue();
 	afx_msg void OnSetfocusArr1();
 	afx_msg void OnSetfocusArr2();
 //	afx_msg void OnChangeArr3();
 	afx_msg void OnSetfocusBoldcode();
 	//afx_msg void OnSetfocusPlustail();
-	afx_msg void OnSetfocusTwocode();
+	//afx_msg void OnSetfocusTwocode();
 	afx_msg void OnSetfocusArr3();
 	afx_msg void OnBnClickedForcast();
 	afx_msg void OnBnClickedKillcode();
@@ -128,7 +128,7 @@ public:
 //	CEdit m_dshou;
 	//CButton m_deCheck;
 	//afx_msg void OnEnChangeDshou();
-	//afx_msg void OnSetfocusDshou();
+	afx_msg void OnSetfocusDshou();
 	//afx_msg void OnClickedDecheck();
 //	CButton m_bigSum;
 	//afx_msg void OnClickedBigsum();
@@ -146,6 +146,7 @@ public:
 //	CButton mGenType;
 //	CButton outputCheck;
 //	CEdit m_kuaDu;
+	CEdit m_dshou;
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);

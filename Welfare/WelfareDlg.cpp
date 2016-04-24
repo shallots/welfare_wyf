@@ -122,7 +122,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_REINFO, m_REInfo);
 	DDX_Control(pDX, IDC_RESET, m_reset);
 	DDX_Control(pDX, IDC_REVOCATION, m_revocation);
-	DDX_Control(pDX, IDC_TWOCODE, m_twoCode);
+//	DDX_Control(pDX, IDC_TWOCODE, m_twoCode);
 	//  DDX_Control(pDX, IDC_SIFT, m_sift);
 	//DDX_Control(pDX, IDC_DIRECT, m_direct);
 	//  DDX_Control(pDX, IDC_PREPRINT, m_prePrint);
@@ -134,7 +134,6 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_HUNDRED, m_hundred);
 	//  DDX_Control(pDX, IDC_DECADE, m_decade);
 	//  DDX_Control(pDX, IDC_UNIT, m_unit);
-	//  DDX_Control(pDX, IDC_DShou, m_dshou);
 	//DDX_Control(pDX, IDC_DECheck, m_deCheck);
 	//  DDX_Control(pDX, IDC_BIGSUM, m_bigSum);
 	//  DDX_Control(pDX, IDC_THREE, m_three);
@@ -144,6 +143,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_RADIO1, mGenType);
 	//  DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
 	//  DDX_Control(pDX, IDC_KUADU, m_kuaDu);
+	DDX_Control(pDX, IDC_DSou, m_dshou);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -157,7 +157,7 @@ BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
 	//	ON_EN_CHANGE(IDC_ARR3, &CWelfareDlg::OnChangeArr3)
 	ON_EN_SETFOCUS(IDC_BOLDCODE, &CWelfareDlg::OnSetfocusBoldcode)
 	//ON_EN_SETFOCUS(IDC_PLUSTAIL, &CWelfareDlg::OnSetfocusPlustail)
-	ON_EN_SETFOCUS(IDC_TWOCODE, &CWelfareDlg::OnSetfocusTwocode)
+	//ON_EN_SETFOCUS(IDC_TWOCODE, &CWelfareDlg::OnSetfocusTwocode)
 	ON_EN_SETFOCUS(IDC_ARR3, &CWelfareDlg::OnSetfocusArr3)
 	ON_BN_CLICKED(IDC_FORCAST, &CWelfareDlg::OnBnClickedForcast)
 	ON_BN_CLICKED(IDC_KILLCODE, &CWelfareDlg::OnBnClickedKillcode)
@@ -179,7 +179,7 @@ BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
 	//ON_BN_CLICKED(IDC_KILLODDEVEN, &CWelfareDlg::OnBnClickedKilloddeven)
 	//ON_BN_CLICKED(IDC_KILLBIGLITTLE, &CWelfareDlg::OnBnClickedKillbiglittle)
 	//ON_EN_CHANGE(IDC_DShou, &CWelfareDlg::OnEnChangeDshou)
-	//ON_EN_SETFOCUS(IDC_DShou, &CWelfareDlg::OnSetfocusDshou)
+	ON_EN_SETFOCUS(IDC_DSou, &CWelfareDlg::OnSetfocusDshou)
 	//ON_BN_CLICKED(IDC_DECheck, &CWelfareDlg::OnClickedDecheck)
 	//ON_BN_CLICKED(IDC_BIGSUM, &CWelfareDlg::OnClickedBigsum)
 	ON_EN_CHANGE(IDC_THREE, &CWelfareDlg::OnEnChangeEdit1)
@@ -272,7 +272,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	int StatusBarH = 20;
 	m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.04.17)"));
+	m_StatusBar.SetPaneText(1,_T("我要发·518 (2016.04.24)"));
 
 	//mGenType.SetCheck(true);
 
@@ -417,11 +417,11 @@ void CWelfareDlg::OnSetfocusBoldcode()
 //}
 
 
-void CWelfareDlg::OnSetfocusTwocode()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	m_REInfo.SetWindowTextW(_T("请输入八卦二码，以“#”、“/”、“,”等任意单字符间隔符号隔开,\n如，09#34#45,68/23/90/69"));
-}
+//void CWelfareDlg::OnSetfocusTwocode()
+//{
+//	// TODO: 在此添加控件通知处理程序代码
+//	m_REInfo.SetWindowTextW(_T("请输入八卦二码，以“#”、“/”、“,”等任意单字符间隔符号隔开,\n如，09#34#45,68/23/90/69"));
+//}
 
 
 void CWelfareDlg::OnBnClickedForcast()
@@ -549,7 +549,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	vector<Gossip> gossip;
 	vector<int> arrkc[5];
 	CString csstr[5];
-	CString sgossip;
+	//CString sgossip;
 	CString mKuadu;
 
 	//m_plusTail.GetWindowTextW(csstr[0]);
@@ -557,11 +557,11 @@ void CWelfareDlg::OnBnClickedKillcode()
 	//m_hundred.GetWindowTextW(csstr[2]);
 	//m_decade.GetWindowTextW(csstr[3]);
 	//m_unit.GetWindowTextW(csstr[4]);
-	m_twoCode.GetWindowTextW(sgossip);
+	//m_twoCode.GetWindowTextW(sgossip);
 	//m_kuaDu.GetWindowTextW(mKuadu);
 	int count = 0;
 	if(csstr[0].GetLength()||csstr[1].GetLength()
-		|| sgossip.GetLength()||csstr[2].GetLength()||csstr[3].GetLength()
+		||csstr[2].GetLength()||csstr[3].GetLength()
 		||csstr[4].GetLength())
 	{
 		for(int i=1; i<2; i++)
@@ -575,29 +575,29 @@ void CWelfareDlg::OnBnClickedKillcode()
 			}
 		}
 
-		int length = sgossip.GetLength();
-		if(length>2)
-		{
-			char *p = (LPSTR)(LPCTSTR)sgossip;
-			int k=1;
-			for(int j=0; j<2*length; j=j+2)
-			{
-				if(!(k%3))
-				{
-					k += 1;
-					continue;
-				}
-				Gossip tmp;
-				tmp.x=  *(p+j)-48;
-				j = j+2;
-				tmp.y =  *(p+j)-48;
-				gossip.push_back(tmp);
+		//int length = sgossip.GetLength();
+		//if(length>2)
+		//{
+		//	char *p = (LPSTR)(LPCTSTR)sgossip;
+		//	int k=1;
+		//	for(int j=0; j<2*length; j=j+2)
+		//	{
+		//		if(!(k%3))
+		//		{
+		//			k += 1;
+		//			continue;
+		//		}
+		//		Gossip tmp;
+		//		tmp.x=  *(p+j)-48;
+		//		j = j+2;
+		//		tmp.y =  *(p+j)-48;
+		//		gossip.push_back(tmp);
 
-				k += 2;
-			}
-		}
+		//		k += 2;
+		//	}
+		//}
 		/*count = ec->killCode(arrkc[0],arrkc[1],arrkc[2],arrkc[3],arrkc[4],gossip);*/
-		count = ec->killCode(arrkc[1],gossip);
+		count = ec->killCode(arrkc[1]);
 	}else{
 		m_REInfo.SetWindowTextW(_T("请至少输入一类编码作杀码。"));
 	}
@@ -634,23 +634,22 @@ void CWelfareDlg::OnBnClickedKillcode()
 	//	tcSelCount = ec->tcSelect(buft);
 	//}
 
-	//// 解析钓叟码
-	//CString dshouStr;
-	//m_dshou.GetWindowTextW(dshouStr);
-	//// 待转换CString变量
-	//wchar_t *ptrx;             
-	//char bufx[256];        // 目标存储空间
-	//memset(bufx,'\0',256);
-	//int dslength = dshouStr.GetLength()>255?255:dshouStr.GetLength();
-	//ptrx=dshouStr.GetBuffer(dslength*sizeof(wchar_t));
-	//WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrx, -1, bufx, sizeof(bufx), NULL, NULL);
-	//int  dsSelCount=0;
-	//int selStrlen = strlen(bufx);
-	//// 钓叟选码
-	//if(selStrlen > 0){
-	//	
-	//	dsSelCount = ec->dsSelect(bufx);
-	//}
+	// 解析钓叟码
+	CString dshouStr;
+	m_dshou.GetWindowTextW(dshouStr);
+	// 待转换CString变量
+	wchar_t *ptrx;             
+	char bufx[256];        // 目标存储空间
+	memset(bufx,'\0',256);
+	int dslength = dshouStr.GetLength()>255?255:dshouStr.GetLength();
+	ptrx=dshouStr.GetBuffer(dslength*sizeof(wchar_t));
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrx, -1, bufx, sizeof(bufx), NULL, NULL);
+	int  dsSelCount=0;
+	int selStrlen = strlen(bufx);
+	// 钓叟选码
+	if(selStrlen > 0){
+		dsSelCount = ec->dsSelect(bufx);
+	}
 
 	//// 杀大和
 	//int bigCount = 0;
@@ -721,7 +720,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	//if(blCount != 0)
 	//{
 	//	int delTotal = count+blCount;
-		ts.Format(_T("杀码 %d 注，选出 %d 注."),count,ec->dvCode.size());
+		ts.Format(_T("杀码 %d 注，选出 %d 注."),count+dsSelCount,ec->dvCode.size());
 	/*}else
 		ts.Format(_T("杀码 %d 注，余 %d 注(其中对子 %d 注,非对子 %d 注)."),count,ec->dvCode.size(),pairCount,ec->dvCode.size()-pairCount);*/
 	m_REInfo.SetWindowTextW(ts);
@@ -1021,12 +1020,12 @@ void CWelfareDlg::OnBnClickedReset()
 	m_arr4.SetWindowTextW(_T(""));
 	//m_plusTail.SetWindowTextW(_T(""));
 	m_boldCode.SetWindowTextW(_T(""));
-	m_twoCode.SetWindowTextW(_T(""));
+//	m_twoCode.SetWindowTextW(_T(""));
 	m_REInfo.SetWindowTextW(_T(""));
 	//m_hundred.SetWindowTextW(_T(""));
 	//m_decade.SetWindowTextW(_T(""));
 	//m_unit.SetWindowTextW(_T(""));
-	//m_dshou.SetWindowTextW(_T(""));
+	m_dshou.SetWindowTextW(_T(""));
 	//m_deCheck.EnableWindow(false);
 	//m_deCheck.SetCheck(false);
 	//m_bigSum.SetCheck(false);
@@ -1363,11 +1362,11 @@ CString CWelfareDlgGetFileVer()
 //}
 
 
-//void CWelfareDlg::OnSetfocusDshou()
-//{
-//	// TODO: 在此添加控件通知处理程序代码
-//	m_REInfo.SetWindowTextW(_T("可输入任意组钓叟码，中间用#、/、*等字符隔开，例如：\n\t168#2518#56789\n\t123456 32457 45678"));
-//}
+void CWelfareDlg::OnSetfocusDshou()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_REInfo.SetWindowTextW(_T("可输入任意组钓叟码，中间用#、/、*等字符隔开，例如：\n\t168#2518#56789\n\t123456 32457 45678"));
+}
 
 // 转换为直选
 //void CWelfareDlg::OnClickedDecheck()

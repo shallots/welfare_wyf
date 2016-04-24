@@ -469,7 +469,7 @@ int Encode::selectBasedSpan(vector<int> span){
 *	作者：Hyw
 *	日期：13/05/13
 ************************************************/
-int Encode::killCode(vector<int> boldcode,vector<Gossip> gossip)
+int Encode::killCode(vector<int> boldcode)
 {
 	if(!codeFlag)
 	{
@@ -490,24 +490,6 @@ int Encode::killCode(vector<int> boldcode,vector<Gossip> gossip)
 				break;
 			}else{
 				flag = false;
-			}
-		}
-				// 胆码判定成功才能进入八卦二码杀码
-		if(flag || (!boldcode.size() && gossip.size()))
-		{
-			for(vector<Gossip>::iterator it=gossip.begin(); it != gossip.end(); it++)
-			{
-				if((itcode->codeSeq[0] == it->x ||
-					itcode->codeSeq[1] == it->x ) &&
-					(itcode->codeSeq[0] == it->y ||
-					itcode->codeSeq[1] == it->y))
-				{
-					flag = true;
-					break;
-				}
-				else{
-					flag = false;
-				}
 			}
 		}
 		
@@ -782,7 +764,7 @@ int Encode::dsSelect(char *dsxSeq){
 			count++;
 		}
 	}
-	delete []dsxSeq;
+	//delete []dsxSeq;
 	for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++ ){
 		delete [] (*itd);
 	}
