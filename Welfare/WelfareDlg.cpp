@@ -109,8 +109,8 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_ARR1, m_arr1);
-	DDX_Control(pDX, IDC_ARR2, m_arr2);
-	DDX_Control(pDX, IDC_ARR3, m_arr3);
+	//  DDX_Control(pDX, IDC_ARR2, m_arr2);
+	//  DDX_Control(pDX, IDC_ARR3, m_arr3);
 	DDX_Control(pDX, IDC_BOLDCODE, m_boldCode);
 	DDX_Control(pDX, IDC_CHECKTIP, m_checkTip);
 	DDX_Control(pDX, IDC_EXPORT, m_export);
@@ -122,11 +122,11 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_REINFO, m_REInfo);
 	DDX_Control(pDX, IDC_RESET, m_reset);
 	DDX_Control(pDX, IDC_REVOCATION, m_revocation);
-//	DDX_Control(pDX, IDC_TWOCODE, m_twoCode);
+	//	DDX_Control(pDX, IDC_TWOCODE, m_twoCode);
 	//  DDX_Control(pDX, IDC_SIFT, m_sift);
 	//DDX_Control(pDX, IDC_DIRECT, m_direct);
 	//  DDX_Control(pDX, IDC_PREPRINT, m_prePrint);
-	DDX_Control(pDX, IDC_ARR4, m_arr4);
+	//  DDX_Control(pDX, IDC_ARR4, m_arr4);
 	//  DDX_Control(pDX, IDC_KILLBIGLITTLE, m_killABL);
 	//  DDX_Control(pDX, IDC_KILLODDEVEN, m_killAOE);
 	//  DDX_Control(pDX, IDC_KILLPAIR, m_killPair);
@@ -223,10 +223,10 @@ BOOL CWelfareDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	m_arr1.SetLimitText(10);
-	m_arr2.SetLimitText(10);
-	m_arr3.SetLimitText(10);
-	m_arr4.SetLimitText(10);
+	m_arr1.SetLimitText(64);
+	//m_arr2.SetLimitText(10);
+	//m_arr3.SetLimitText(10);
+	//m_arr4.SetLimitText(10);
 	m_checkTip.SetCheck(1);
 	//outputCheck.SetCheck(1);
 	//m_deCheck.EnableWindow(false);
@@ -437,91 +437,105 @@ void CWelfareDlg::OnBnClickedForcast()
 		forcastFlag = FALSE;
 	}
 
-	CString csarr[4];
-	int arrCount = 0;
-	int nullArrIndex = -1;
-	m_arr1.GetWindowTextW(csarr[0]);
-	m_arr2.GetWindowTextW(csarr[1]);
-	m_arr3.GetWindowTextW(csarr[2]);
-	m_arr4.GetWindowTextW(csarr[3]);
+	//CString csarr[4];
+	//int arrCount = 0;
+	//int nullArrIndex = -1;
+	//m_arr1.GetWindowTextW(csarr[0]);
+	//m_arr2.GetWindowTextW(csarr[1]);
+	//m_arr3.GetWindowTextW(csarr[2]);
+	//m_arr4.GetWindowTextW(csarr[3]);
 
 	//MessageBoxW(csarr[0] + "-" + csarr[1] + "-" + csarr[2] + "-" + csarr[3]);
 
-	for(int i=0; i<4; i++)
-	{
-		if(csarr[i].GetLength()>=1)
-			arrCount++;
-		else
-			nullArrIndex = i;
-	}
+	//for(int i=0; i<4; i++)
+	//{
+	//	if(csarr[i].GetLength()>=1)
+	//		arrCount++;
+	//	else
+	//		nullArrIndex = i;
+	//}
 
-	if(arrCount<3 || arrCount>4){
-		m_REInfo.SetWindowTextW(_T("输入数据不完整,请仔细检查!"));
-		return;
-	}
+	//if(arrCount<3 || arrCount>4){
+	//	m_REInfo.SetWindowTextW(_T("输入数据不完整,请仔细检查!"));
+	//	return;
+	//}
 
-	vector<int> arr[4];
+	//vector<int> arr[4];
 
-	for(int i=0; i<4; i++)
-	{
-		int length = csarr[i].GetLength();
-		char *p = (LPSTR)(LPCTSTR)csarr[i];
-		for(int j=0; j<2*length; j=j+2)
-		{
-			int tmp = *(p+j) - 48;
-			arr[i].push_back(tmp);
-		}
-	}
+	//for(int i=0; i<4; i++)
+	//{
+	//	int length = csarr[i].GetLength();
+	//	char *p = (LPSTR)(LPCTSTR)csarr[i];
+	//	for(int j=0; j<2*length; j=j+2)
+	//	{
+	//		int tmp = *(p+j) - 48;
+	//		arr[i].push_back(tmp);
+	//	}
+	//}
 
-	// 判断各组序列是否有数字重复
-	for(int i=0; i<4; i++)
-	{
-		int flag[MAXSIZE] = {0};
-		for(vector<int>::iterator it = arr[i].begin(); it != arr[i].end(); it++)
-		{
-			if( flag[*it] == 1)
-			{
-				CString tmp;
-				tmp.Format(_T("序列 %d 有数字重复,请重新输入"),i+1);
-				m_REInfo.SetWindowTextW(tmp);
-				return;
-			}else{
-				flag[*it] = 1;
-			}
-		}
-	}
-	if(arrCount ==3)
-	{
-		int indexFlag[3];
-		int j=0;
-		for(int i=0; i<4; i++)
-		{
-			if(i==nullArrIndex)
-				continue;
-			indexFlag[j++] = i;
-		}
-		if(ec->encodingTwoCombination(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]]))
-		{
-			forcastFlag = TRUE;
-			arr[0].clear();
-			arr[1].clear();
-			arr[2].clear();
-		}else
-			return;
-	}else if (arrCount == 4 && ec->encodingTwoCombination(arr[0],arr[1],arr[2],arr[3])){
+	//// 判断各组序列是否有数字重复
+	//for(int i=0; i<4; i++)
+	//{
+	//	int flag[MAXSIZE] = {0};
+	//	for(vector<int>::iterator it = arr[i].begin(); it != arr[i].end(); it++)
+	//	{
+	//		if( flag[*it] == 1)
+	//		{
+	//			CString tmp;
+	//			tmp.Format(_T("序列 %d 有数字重复,请重新输入"),i+1);
+	//			m_REInfo.SetWindowTextW(tmp);
+	//			return;
+	//		}else{
+	//			flag[*it] = 1;
+	//		}
+	//	}
+	//}
+	//if(arrCount ==3)
+	//{
+	//	int indexFlag[3];
+	//	int j=0;
+	//	for(int i=0; i<4; i++)
+	//	{
+	//		if(i==nullArrIndex)
+	//			continue;
+	//		indexFlag[j++] = i;
+	//	}
+	//	if(ec->encodingTwoCombination(arr[indexFlag[0]],arr[indexFlag[1]],arr[indexFlag[2]]))
+	//	{
+	//		forcastFlag = TRUE;
+	//		arr[0].clear();
+	//		arr[1].clear();
+	//		arr[2].clear();
+	//	}else
+	//		return;
+	//}else if (arrCount == 4 && ec->encodingTwoCombination(arr[0],arr[1],arr[2],arr[3])){
 
-		forcastFlag = TRUE;
-		arr[0].clear();
-		arr[1].clear();
-		arr[2].clear();
-		arr[3].clear();
-	}
+	//	forcastFlag = TRUE;
+	//	arr[0].clear();
+	//	arr[1].clear();
+	//	arr[2].clear();
+	//	arr[3].clear();
+	//}
+
+	// 解析预测序列
+	CString fcStr;
+	m_arr1.GetWindowTextW(fcStr);
+	// 待转换CString变量
+	wchar_t *ptrz;             
+	char buft[256];        // 目标存储空间
+	memset(buft,'\0',256);
+	int tclength = fcStr.GetLength()>255?255:fcStr.GetLength();
+	ptrz=fcStr.GetBuffer(tclength*sizeof(wchar_t));
+	WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)ptrz, -1, buft, sizeof(buft), NULL, NULL);
+
+	ec->encodingGossipFreqCode(buft);
+	forcastFlag = TRUE;
 
 	//ec->groupChoose();
 
 	// 和值尾有序化
 	// ec->ordering();
-	ec->orderByVal();
+	//ec->orderByVal();
 	// 输出到右边列表中
 	for(vector<CodeType>::iterator it=ec->dvCode.begin(); it != ec->dvCode.end(); it++)
 	{
@@ -916,9 +930,10 @@ void CWelfareDlg::OnBnClickedExport()
 
 	CMyFont font = oSel.get_Font();
 	CString str;
-	str.Format(_T("\t\t第 %d 期 福彩3D码预测（%s）打印报表\n"),issue,codetype);	
+	//str.Format(_T("\t\t第 %d 期 福彩3D码预测（%s）打印报表\n"),issue,codetype);	
+	str.Format(_T("\t\t第 %d 期 福彩3D码预测（八卦二码频度法）报表\n"),issue);	
 	font.put_Name(_T("黑体"));
-	font.put_Size(18);
+	font.put_Size(16);
 	oSel.TypeText(str);
 	str.Format(_T("\t\t\t\t共计 %d 注3D码,本报表由 我要发·518 导出！！\n"),count);
 	font.put_Name(_T("宋体"));
@@ -1015,9 +1030,9 @@ void CWelfareDlg::OnBnClickedReset()
 	queueNum = 0;
 	m_issue.SetWindowTextW(_T(""));
 	m_arr1.SetWindowTextW(_T(""));
-	m_arr2.SetWindowTextW(_T(""));
-	m_arr3.SetWindowTextW(_T(""));
-	m_arr4.SetWindowTextW(_T(""));
+	//m_arr2.SetWindowTextW(_T(""));
+	//m_arr3.SetWindowTextW(_T(""));
+	//m_arr4.SetWindowTextW(_T(""));
 	//m_plusTail.SetWindowTextW(_T(""));
 	m_boldCode.SetWindowTextW(_T(""));
 //	m_twoCode.SetWindowTextW(_T(""));

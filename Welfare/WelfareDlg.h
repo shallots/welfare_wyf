@@ -73,8 +73,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CEdit m_arr1;
-	CEdit m_arr2;
-	CEdit m_arr3;
+//	CEdit m_arr2;
+//	CEdit m_arr3;
 	CEdit m_boldCode;
 	CButton m_checkTip;
 	CButton m_export;
@@ -111,7 +111,7 @@ public:
 	afx_msg void OnQuit();
 //	CButton m_prePrint;
 //	afx_msg void OnBnClickedPreprint();
-	CEdit m_arr4;
+//	CEdit m_arr4;
 	afx_msg void OnSetfocusArr4();
 	afx_msg void OnAbout();
 	afx_msg void OnSelchangeListcode();

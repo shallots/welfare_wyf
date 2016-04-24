@@ -88,6 +88,9 @@
     <ClInclude Include="CParagraphFormat.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GossipFreq.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Welfare.cpp">
@@ -109,6 +112,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PrePrintDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GossipFreq.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

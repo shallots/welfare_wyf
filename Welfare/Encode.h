@@ -14,6 +14,7 @@ typedef struct
 	unsigned int mantissa;
 	int frequency;
 	int span;					// 跨度
+	bool isPair;
 }CodeType;
 
 typedef struct
@@ -51,6 +52,9 @@ public:
 	int encodingTwoCombination(vector<int>**,int);
 	int encodingTwoCombination(vector<int>, vector<int>, vector<int>);
 	int encodingTwoCombination(vector<int>, vector<int>, vector<int>, vector<int>);
+
+	// 八卦二码频度法
+	int encodingGossipFreqCode(char *numstr);
 
 	// 去重
 	int de_weight();

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Encode.h"
+#include "GossipFreq.h"
 using std::sort;
 Encode::Encode()
 {
@@ -277,6 +278,31 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, vector<int>
 	return dvCode.size();
 }
 
+int Encode::encodingGossipFreqCode(char *numstr)
+{
+	if(numstr == NULL)
+		return 0;
+	GossipFreq gf(numstr,0);
+
+	vector<GossipType>* vec = gf.genGossipFreqCode();
+	if(vec == NULL || vec->size() <= 0) return 0;
+	for(vector<GossipType>::iterator it = vec->begin(); it!=vec->end(); it++)
+	{
+		GossipType gsp = *it;
+		CodeType tmp;
+		tmp.codeSeq[0] = gsp.gossip[0]-'0';
+		tmp.codeSeq[1] = gsp.gossip[1]-'0';
+		tmp.codeSeq[2] = 0;
+		tmp.frequency = gsp.freq;
+		tmp.isPair = gsp.isPair;
+		dvCode.push_back(tmp);
+	}
+	orderByFreq();
+	codeFlag = true;
+	return dvCode.size();
+}
+
+
 // 取得编码最大值
 inline int getMax(const vector<CodeType>::iterator va)
 {
@@ -480,6 +506,11 @@ int Encode::killCode(vector<int> boldcode)
 		//  杀码,算法有待优化
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
 	{
+		// 对子不进行杀码
+		if((*itcode).isPair){
+			itcode ++;
+			continue;
+		}
 		bool flag = false;
 		for(vector<int>::iterator it = boldcode.begin(); it != boldcode.end(); it++)
 		{
@@ -677,8 +708,8 @@ bool isInSeq(vector<CodeType>::iterator it, int* ptr){
 			flag++;
 		if(ptr[i] == it->codeSeq[1])
 			flag++;
-		if(ptr[i] == it->codeSeq[2])
-			flag++;
+		//if(ptr[i] == it->codeSeq[2])
+		//	flag++;
 		i++;
 	}
 	if(flag >1)
@@ -733,6 +764,7 @@ int Encode::tcSelect(char *tcSeq){
 	delete []tcSeq;
 	for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++ ){
 		delete [] (*itd);
+		*itd = NULL;
 	}
 	seq.clear();
 	return count;
@@ -748,6 +780,10 @@ int Encode::dsSelect(char *dsxSeq){
 	int count = 0;
 	vector<int*> seq = parseSeq(dsxSeq);
 	for(vector<CodeType>::iterator it= dvCode.begin(); it!=dvCode.end();){
+		if((*it).isPair) {
+			it++;
+			continue;
+		}
 		bool flag = false;
 		for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++){
 			int* ptr = *itd;

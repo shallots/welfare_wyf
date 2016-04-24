@@ -121,6 +121,7 @@
     <ClInclude Include="CSelection.h" />
     <ClInclude Include="DlgProxy.h" />
     <ClInclude Include="Encode.h" />
+    <ClInclude Include="GossipFreq.h" />
     <ClInclude Include="PrePrintDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -132,6 +133,7 @@
     <ClCompile Include="CListBox.cpp" />
     <ClCompile Include="DlgProxy.cpp" />
     <ClCompile Include="Encode.cpp" />
+    <ClCompile Include="GossipFreq.cpp" />
     <ClCompile Include="PrePrintDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
