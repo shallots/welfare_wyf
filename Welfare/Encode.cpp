@@ -15,17 +15,17 @@ Encode::~Encode()
 }
 
 /*********************************************************
-*	Ãû³Æ£ºÈıÏòÁ¿±àÂëº¯Êı
-*	¹¦ÄÜ£ºÊ¹ÓÃÈı×éÕûÊıÏòÁ¿½øĞĞ±àÂë
-*	²ÎÊı£º
-*		da,µÚÒ»×éÕûÊıÏòÁ¿£»db£¬µÚ¶ş×éÕûÊıÏòÁ¿£»dc£¬µÚÈı×éÕûÊıÏòÁ¿
-*	×÷Õß:Hyw
-*	ÈÕÆÚ:14/06/04
-*	ËµÃ÷:ĞÂ°æÒªÇó×éÑ¡É±Âë£¬×îºó¿Éµ¼³öÖ±Ñ¡£¬±àÂëÔ¤²âÂëÊ±ÏÈÉú³É¶şÂë
+*	åç§°ï¼šä¸‰å‘é‡ç¼–ç å‡½æ•°
+*	åŠŸèƒ½ï¼šä½¿ç”¨ä¸‰ç»„æ•´æ•°å‘é‡è¿›è¡Œç¼–ç 
+*	å‚æ•°ï¼š
+*		da,ç¬¬ä¸€ç»„æ•´æ•°å‘é‡ï¼›dbï¼Œç¬¬äºŒç»„æ•´æ•°å‘é‡ï¼›dcï¼Œç¬¬ä¸‰ç»„æ•´æ•°å‘é‡
+*	ä½œè€…:Hyw
+*	æ—¥æœŸ:14/06/04
+*	è¯´æ˜:æ–°ç‰ˆè¦æ±‚ç»„é€‰æ€ç ï¼Œæœ€åå¯å¯¼å‡ºç›´é€‰ï¼Œç¼–ç é¢„æµ‹ç æ—¶å…ˆç”ŸæˆäºŒç 
 *********************************************************/
 int Encode::encodingTwo(vector<int> da, vector<int> db, vector<int> dc)
 {
-	//  ÔİÎ´Ğ´Òì³£´¦Àí
+	//  æš‚æœªå†™å¼‚å¸¸å¤„ç†
 	if(codeFlag)
 	{
 		return 0;
@@ -35,7 +35,7 @@ int Encode::encodingTwo(vector<int> da, vector<int> db, vector<int> dc)
 		return -1;
 	}
 
-	// Ö±Ñ¡±àÂë
+	// ç›´é€‰ç¼–ç 
 	vector<int> *data[3];
 	data[0] = &da;
 	data[1] = &db;
@@ -72,18 +72,18 @@ int Encode::encodingTwo(vector<int> da, vector<int> db, vector<int> dc)
 }
 
 /*********************************************************
-*	Ãû³Æ£ºÈıÏòÁ¿±àÂëº¯Êı
-*	¹¦ÄÜ£ºÊ¹ÓÃÈı×éÕûÊıÏòÁ¿½øĞĞ±àÂë
-*	²ÎÊı£º
-*		da,µÚÒ»×éÕûÊıÏòÁ¿£»db£¬µÚ¶ş×éÕûÊıÏòÁ¿£»dc£¬µÚÈı×éÕûÊıÏòÁ¿
-*	×÷Õß:Hyw
-*	ÈÕÆÚ:13/05/13
-*   ×¢ÊÍ: ĞÂ°æ±¾£¬ÏÈÉú³ÉÁ½ÂëÔÙÉú³É3Âë£¬¹Ê´Ëº¯Êı·ÏÆú
+*	åç§°ï¼šä¸‰å‘é‡ç¼–ç å‡½æ•°
+*	åŠŸèƒ½ï¼šä½¿ç”¨ä¸‰ç»„æ•´æ•°å‘é‡è¿›è¡Œç¼–ç 
+*	å‚æ•°ï¼š
+*		da,ç¬¬ä¸€ç»„æ•´æ•°å‘é‡ï¼›dbï¼Œç¬¬äºŒç»„æ•´æ•°å‘é‡ï¼›dcï¼Œç¬¬ä¸‰ç»„æ•´æ•°å‘é‡
+*	ä½œè€…:Hyw
+*	æ—¥æœŸ:13/05/13
+*   æ³¨é‡Š: æ–°ç‰ˆæœ¬ï¼Œå…ˆç”Ÿæˆä¸¤ç å†ç”Ÿæˆ3ç ï¼Œæ•…æ­¤å‡½æ•°åºŸå¼ƒ
 *********************************************************/
 
 int Encode::encodingThree(vector<int> da, vector<int> db, vector<int> dc)
 {
-	//  ÔİÎ´Ğ´Òì³£´¦Àí
+	//  æš‚æœªå†™å¼‚å¸¸å¤„ç†
 	if(codeFlag)
 	{
 		return 0;
@@ -93,7 +93,7 @@ int Encode::encodingThree(vector<int> da, vector<int> db, vector<int> dc)
 		return -1;
 	}
 
-	// Ö±Ñ¡±àÂë
+	// ç›´é€‰ç¼–ç 
 	vector<int> *data[3];
 	data[0] = &da;
 	data[1] = &db;
@@ -145,17 +145,17 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, bool type){
 		return encodingThree(da, db, dc);
 }
 /*********************************************************
-*	Ãû³Æ£ºËÄÏòÁ¿±àÂëº¯Êı
-*	¹¦ÄÜ£ºÊ¹ÓÃËÄ×éÕûÊıĞòÁĞ½øĞĞ±àÂë
-*	²ÎÊı£º
-*		da,µÚÒ»×éÕûÊıÏòÁ¿£»db£¬µÚ¶ş×éÕûÊıÏòÁ¿£»dc£¬µÚÈı×éÕûÊıÏòÁ¿£¬
-*		dd,µÚËÄ×éÕûÊıÏòÁ¿
-*	×÷Õß:Hyw
-*	ÈÕÆÚ:13/06/02
+*	åç§°ï¼šå››å‘é‡ç¼–ç å‡½æ•°
+*	åŠŸèƒ½ï¼šä½¿ç”¨å››ç»„æ•´æ•°åºåˆ—è¿›è¡Œç¼–ç 
+*	å‚æ•°ï¼š
+*		da,ç¬¬ä¸€ç»„æ•´æ•°å‘é‡ï¼›dbï¼Œç¬¬äºŒç»„æ•´æ•°å‘é‡ï¼›dcï¼Œç¬¬ä¸‰ç»„æ•´æ•°å‘é‡ï¼Œ
+*		dd,ç¬¬å››ç»„æ•´æ•°å‘é‡
+*	ä½œè€…:Hyw
+*	æ—¥æœŸ:13/06/02
 *********************************************************/
 int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, vector<int> dd, bool type)
 {
-	// Î´Ğ´Òì³£´¦Àí
+	// æœªå†™å¼‚å¸¸å¤„ç†
 	if(codeFlag)
 	{
 		return 0;
@@ -182,7 +182,7 @@ int Encode::encoding(vector<int> da, vector<int> db, vector<int> dc, vector<int>
 	return dvCode.size();
 }
 
-// È¡µÃ±àÂë×î´óÖµ
+// å–å¾—ç¼–ç æœ€å¤§å€¼
 inline int getMax(const vector<CodeType>::iterator va)
 {
 	int maxa = va->codeSeq[0]>va->codeSeq[1]?va->codeSeq[0]:va->codeSeq[1];
@@ -190,7 +190,7 @@ inline int getMax(const vector<CodeType>::iterator va)
 	return maxa;
 }
 
-// È¡µÃ±àÂë×îĞ¡Öµ
+// å–å¾—ç¼–ç æœ€å°å€¼
 inline int getMin(const vector<CodeType>::iterator va)
 {
 	int mina = va->codeSeq[0]>va->codeSeq[1]?va->codeSeq[1]:va->codeSeq[0];
@@ -199,10 +199,10 @@ inline int getMin(const vector<CodeType>::iterator va)
 }
 
 /***********************************************
-*	Ãû³Æ£ºÈ¥ÖØº¯Êı
-*	¹¦ÄÜ£ºÖ±Ñ¡¸¨Öúº¯ÊıÈ¥ÖØ
-*	×÷Õß£ºHyw
-*	ÈÕÆÚ£º14/04/04
+*	åç§°ï¼šå»é‡å‡½æ•°
+*	åŠŸèƒ½ï¼šç›´é€‰è¾…åŠ©å‡½æ•°å»é‡
+*	ä½œè€…ï¼šHyw
+*	æ—¥æœŸï¼š14/04/04
 ************************************************/
 int Encode::de_weight()
 {
@@ -224,10 +224,10 @@ int Encode::de_weight()
 	return dvCode.size();
 }
 /***********************************************
-*	Ãû³Æ£º×éÑ¡º¯Êı
-*	¹¦ÄÜ£ºÔÚÖ±Ñ¡µÄ»ù´¡ÉÏÊµÏÖ×éÑ¡
-*	×÷Õß£ºHyw
-*	ÈÕÆÚ£º13/05/13
+*	åç§°ï¼šç»„é€‰å‡½æ•°
+*	åŠŸèƒ½ï¼šåœ¨ç›´é€‰çš„åŸºç¡€ä¸Šå®ç°ç»„é€‰
+*	ä½œè€…ï¼šHyw
+*	æ—¥æœŸï¼š13/05/13
 ************************************************/
 int Encode::groupChoose()
 {
@@ -267,7 +267,7 @@ bool comp(const CodeType &a,const CodeType &b)
 		return a.mantissa < b.mantissa;
 }
 /**********************************
-ÅÅĞò±ê×¼2£º°´3D±àÂë¶ÔÓ¦ÕûÊı´óĞ¡ÅÅĞò
+æ’åºæ ‡å‡†2ï¼šæŒ‰3Dç¼–ç å¯¹åº”æ•´æ•°å¤§å°æ’åº
 ***********************************/
 bool comp2(const CodeType &a, const CodeType &b)
 {
@@ -322,10 +322,10 @@ int Encode::orderByFreq(){
 	return 1;
 }
 /***********************************************
-*	Ãû³Æ£º¿ç¶ÈÑ¡Âë
-*	¹¦ÄÜ£º¼ÆËã3DÂëµÄ¿ç¶È£¬²¢É¸Ñ¡
-*	×÷Õß£ºHyw
-*	ÈÕÆÚ£º05/12/14
+*	åç§°ï¼šè·¨åº¦é€‰ç 
+*	åŠŸèƒ½ï¼šè®¡ç®—3Dç çš„è·¨åº¦ï¼Œå¹¶ç­›é€‰
+*	ä½œè€…ï¼šHyw
+*	æ—¥æœŸï¼š05/12/14
 ************************************************/
 int Encode::selectBasedSpan(vector<int> span){
 	if(span.size()<1 || dvCode.size()<1)
@@ -357,10 +357,10 @@ int Encode::selectBasedSpan(vector<int> span){
 }
 
 /***********************************************
-*	Ãû³Æ£º»ù´¡É±Âëº¯Êı
-*	¹¦ÄÜ£ººÍÖµÎ²£¬µ¨Âë£¬°Ù£¬Ê®£¬¸ö£¬¶şÂëµÈ
-*	×÷Õß£ºHyw
-*	ÈÕÆÚ£º13/05/13
+*	åç§°ï¼šåŸºç¡€æ€ç å‡½æ•°
+*	åŠŸèƒ½ï¼šå’Œå€¼å°¾ï¼Œèƒ†ç ï¼Œç™¾ï¼Œåï¼Œä¸ªï¼ŒäºŒç ç­‰
+*	ä½œè€…ï¼šHyw
+*	æ—¥æœŸï¼š13/05/13
 ************************************************/
 int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,vector<int> decade,vector<int> unit,vector<Gossip> gossip)
 {
@@ -370,14 +370,14 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	}
 	int count = 0;
 
-	// É±ÂëÓĞĞò»¯
+	// æ€ç æœ‰åºåŒ–
 	sort(plustail.begin(),plustail.end());
 	sort(boldcode.begin(),boldcode.end());
 	sort(hdr.begin(),hdr.end());
 	sort(decade.begin(),decade.end());
 	sort(unit.begin(),unit.end());
 
-	//  É±Âë,Ëã·¨ÓĞ´ıÓÅ»¯
+	//  æ€ç ,ç®—æ³•æœ‰å¾…ä¼˜åŒ–
 	for(vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
 	{
 		bool flag = false;
@@ -408,7 +408,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 			}
 		}
 
-		// µ¨ÂëÅĞ¶¨³É¹¦²ÅÄÜ½øÈë°ËØÔ¶şÂëÉ±Âë
+		// èƒ†ç åˆ¤å®šæˆåŠŸæ‰èƒ½è¿›å…¥å…«å¦äºŒç æ€ç 
 		if(flag || (!plustail.size() && !boldcode.size() && gossip.size()))
 		{
 			for(vector<Gossip>::iterator it=gossip.begin(); it != gossip.end(); it++)
@@ -482,7 +482,7 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 }
 
 /********************************
-* ½«×Ö·û´®ĞòÁĞ×ª»¯ÎªÕûÊıÏòÁ¿
+* å°†å­—ç¬¦ä¸²åºåˆ—è½¬åŒ–ä¸ºæ•´æ•°å‘é‡
 *
 *********************************/
 vector<int*> parseSeq(char *dsSeqx){
@@ -517,8 +517,8 @@ vector<int*> parseSeq(char *dsSeqx){
 
 
 /********************************
-* µ±Ô¤²âÂëÓĞÁ½¸ö¼°Á½¸öÒÔÉÏÊı×ÖÔÚ¸ø¶¨ĞòÁĞÖĞÊ±£¬
-* ·µ»Øtrue£¬·ñÔò·µ»Øfalse
+* å½“é¢„æµ‹ç æœ‰ä¸¤ä¸ªåŠä¸¤ä¸ªä»¥ä¸Šæ•°å­—åœ¨ç»™å®šåºåˆ—ä¸­æ—¶ï¼Œ
+* è¿”å›trueï¼Œå¦åˆ™è¿”å›false
 *********************************/
 bool isInSeq(vector<CodeType>::iterator it, int* ptr){
 	int i=0;
@@ -556,7 +556,7 @@ bool isInSeq3(vector<CodeType>::iterator it, int* ptr){
 		return false;
 }
 /********************************
-* ¶¨ÈıÂëº¯Êı
+* å®šä¸‰ç å‡½æ•°
 *********************************/
 int Encode::tcSelect(char *tcSeq){
 	if(strlen(tcSeq)<1){
@@ -590,7 +590,7 @@ int Encode::tcSelect(char *tcSeq){
 }
 
 /********************************
-* µöÛÅÑ¡Âëº¯Êı
+* é’“åŸé€‰ç å‡½æ•°
 *********************************/
 int Encode::dsSelect(char *dsxSeq){
 	if(strlen(dsxSeq)<1){
@@ -615,7 +615,7 @@ int Encode::dsSelect(char *dsxSeq){
 			count++;
 		}
 	}
-	delete []dsxSeq;
+	//delete []dsxSeq;
 	for(vector<int*>::iterator itd = seq.begin(); itd!=seq.end(); itd++ ){
 		delete [] (*itd);
 	}
@@ -756,7 +756,7 @@ void Encode::eraseCode()
 	codetype = GROUP;
 }
 
-// ±È½ÏÔ¤²âÂëÊÇ·ñÏàµÈ
+// æ¯”è¾ƒé¢„æµ‹ç æ˜¯å¦ç›¸ç­‰
 bool codeEqual(const vector<CodeType>::iterator a,const vector<CodeType>::iterator b, int flag){
 	if(flag == DIRECT){
 		return a->codeSeq[0] == b->codeSeq[0] && 
@@ -767,9 +767,9 @@ bool codeEqual(const vector<CodeType>::iterator a,const vector<CodeType>::iterat
 	}
 }
 
-// ¹é²¢ÆäËûEncode¶ÔÏó£¬¼ÆËãdvCodeÆµ¶È
+// å½’å¹¶å…¶ä»–Encodeå¯¹è±¡ï¼Œè®¡ç®—dvCodeé¢‘åº¦
 int Encode::merge(Encode *ec){
-	if(this->dvCode.size() == 0){ // Ö±½ÓcopyÊı¾İ
+	if(this->dvCode.size() == 0){ // ç›´æ¥copyæ•°æ®
 		copydvCode(ec->dvCode, dvCode);
 		codetype = ec->codetype;
 		codeFlag = ec->codeFlag;
@@ -793,11 +793,11 @@ int Encode::merge(Encode *ec){
 		if(pushFlag)
 			dvCode.push_back(*it);
 	}
-	// °´Æµ¶ÈÅÅĞò
+	// æŒ‰é¢‘åº¦æ’åº
 	//orderByFreq();
-	//°´´óĞ¡ÅÅĞò
+	//æŒ‰å¤§å°æ’åº
 	ordering();
-	// ÉèÖÃ±êÖ¾
+	// è®¾ç½®æ ‡å¿—
 	setIsMerge(true);
 	codeFlag = true;
 	return dvCode.size();
