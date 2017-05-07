@@ -473,6 +473,49 @@ int Encode::killCode(vector<int> plustail, vector<int> boldcode,vector<int> hdr,
 	return count;
 }
 
+/**
+百个位仅有一位包含在目标序列中则保存，否则剔除
+**/
+int Encode::killCodeOnHundredAndUnit(set<int> seq)
+{
+	if (!codeFlag)
+	{
+		return 0;
+	}
+
+	if ( seq.empty()) {
+		return 0;
+	}
+
+	int count = 0;
+
+
+	//  杀码,算法有待优化
+	for (vector<CodeType>::iterator itcode = dvCode.begin(); itcode != dvCode.end(); )
+	{
+		int stat = 0;
+		for (set<int>::iterator ita = seq.begin(); ita != seq.end() && stat < 2; ita++) {
+			if (itcode->codeSeq[0] == *ita || itcode->codeSeq[2] == *ita) {
+				stat++;
+			}
+		}
+
+		if (stat != 1) {
+			itcode = dvCode.erase(itcode);
+			count++;
+		}
+		else 
+		{
+			itcode++;
+		}
+
+	}
+
+
+	return count;
+}
+
+
 /********************************
 * 将字符串序列转化为整数向量
 *

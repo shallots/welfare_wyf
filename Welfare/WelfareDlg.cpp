@@ -144,6 +144,7 @@ void CWelfareDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO1, mGenType);
 	DDX_Control(pDX, IDC_CLASSOUTPUT, outputCheck);
 	DDX_Control(pDX, IDC_KUADU, m_kuaDu);
+	DDX_Control(pDX, IDC_HundredAndUnit, m_huandrdunit);
 }
 
 BEGIN_MESSAGE_MAP(CWelfareDlg, CDialogEx)
@@ -272,7 +273,7 @@ BOOL CWelfareDlg::OnInitDialog()
 	 int StatusBarH = 20;
 	 m_StatusBar.MoveWindow(0,rect.bottom- StatusBarH,rect.right,StatusBarH,TRUE);
 	 m_StatusBar.SetPaneText(0,_T("欢迎使用!"));
-	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2014.12.05)"));
+	 m_StatusBar.SetPaneText(1,_T("我要发·518 (2017.05.08)"));
 	 
 	 mGenType.SetCheck(true);
 
@@ -553,6 +554,7 @@ void CWelfareDlg::OnBnClickedKillcode()
 	CString csstr[5];
 	CString sgossip;
 	CString mKuadu;
+	CString hundredAndUnit;
 
 	m_plusTail.GetWindowTextW(csstr[0]);
 	m_boldCode.GetWindowTextW(csstr[1]);
@@ -561,6 +563,8 @@ void CWelfareDlg::OnBnClickedKillcode()
 	m_unit.GetWindowTextW(csstr[4]);
 	m_twoCode.GetWindowTextW(sgossip);
 	m_kuaDu.GetWindowTextW(mKuadu);
+	m_huandrdunit.GetWindowTextW(hundredAndUnit);
+
 	int count = 0;
 	if(csstr[0].GetLength()||csstr[1].GetLength()
 		|| sgossip.GetLength()||csstr[2].GetLength()||csstr[3].GetLength()
@@ -659,6 +663,23 @@ void CWelfareDlg::OnBnClickedKillcode()
 		bigCount = ec->killBig();
 	}
 
+	// 百个位杀码
+	if (hundredAndUnit.GetLength()>0) {
+		int huLength = hundredAndUnit.GetLength();
+		if (huLength>0) {
+			set<int> hu;
+			char *p = (LPSTR)(LPCTSTR)hundredAndUnit;
+			for (int j = 0; j<2 * huLength; j = j + 2)
+			{
+				int tmp = *(p + j) - 48;
+				hu.insert(tmp);
+			}
+			// 百个位杀码
+			count += ec->killCodeOnHundredAndUnit(hu);
+		}
+	}
+
+
 	m_listCode.ResetContent();
 	int siftCount = 0;
 	int oeCount = 0;
@@ -717,6 +738,8 @@ void CWelfareDlg::OnBnClickedKillcode()
 		m_listCode.AddString(tmp);
 		it++;
 	}
+
+
 
 	CString ts;
 	if((siftCount|oeCount|blCount|dsSelCount|bigCount|tcSelCount) != 0)

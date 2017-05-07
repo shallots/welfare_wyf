@@ -34,3 +34,6 @@
 
 # dir
 Release
+.vs
+*.db
+*.opendb

@@ -146,6 +146,7 @@ public:
 	CButton mGenType;
 	CButton outputCheck;
 	CEdit m_kuaDu;
+	CEdit m_huandrdunit;
 };
 int isInSift(CString code);
 BOOL isExtreme(const vector<CodeType>::iterator it);

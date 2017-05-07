@@ -1,12 +1,14 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <set>
 #include <algorithm>
 
 #define GROUP	0
 #define DIRECT	1
 
 using std::vector;
+using std::set;
 
 typedef struct
 {
@@ -60,6 +62,9 @@ public:
 
 	// 杀码，返回杀码个数
 	int killCode(vector<int>,vector<int>,vector<int>,vector<int>,vector<int>,vector<Gossip>);
+
+	// 百个位杀码
+	int killCodeOnHundredAndUnit(set<int>);
 	
 	// 跨度选码
 	int selectBasedSpan(vector<int> span);
